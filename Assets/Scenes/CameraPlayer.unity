@@ -1558,7 +1558,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.7365527, y: 8.47728, z: -8.439001}
+  m_LocalPosition: {x: -5.8996844, y: 5.94808, z: -8.439001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2823,7 +2823,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 491391708}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 36562141f3e01c7499f91e66f806814c, type: 3}
   m_Name: 
@@ -2848,8 +2848,8 @@ MonoBehaviour:
   jumpJoystick: 330
   sprintKeyboard: 304
   jumpKeyboard: 32
-  jumpVelocity: 3
-  groundTolerance: 0.2
+  jumpVelocity: 5
+  groundTolerance: 5
   checkGroundForJump: 1
 --- !u!1001 &584946863
 PrefabInstance:

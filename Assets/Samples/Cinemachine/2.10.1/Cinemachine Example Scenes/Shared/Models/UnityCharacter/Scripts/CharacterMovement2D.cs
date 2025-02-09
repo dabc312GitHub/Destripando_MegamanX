@@ -62,7 +62,7 @@ public class CharacterMovement2D : MonoBehaviour
     {
 #if ENABLE_LEGACY_INPUT_MANAGER
         // Jump
-	    if ((Input.GetKeyDown(jumpJoystick) || Input.GetKeyDown(jumpKeyboard)))
+	    if (isGrounded() && (Input.GetKeyDown(jumpJoystick) || Input.GetKeyDown(jumpKeyboard)))
 	    {
 		    rigbody.AddForce(new Vector3(0, jumpVelocity, 0), ForceMode.Impulse);
 	    }
@@ -74,8 +74,11 @@ public class CharacterMovement2D : MonoBehaviour
 
     public bool isGrounded()
     {
-        if (checkGroundForJump)
-            return Physics.Raycast(transform.position, Vector3.down, groundTolerance);
+	    if (checkGroundForJump)
+	    {
+		    print(Physics.Raycast(transform.position, Vector3.down, groundTolerance));
+		    return Physics.Raycast(transform.position, Vector3.down, groundTolerance);
+	    }
         else
             return true;
     }
