@@ -75,10 +75,7 @@ public class CharacterMovement2D : MonoBehaviour
     public bool isGrounded()
     {
 	    if (checkGroundForJump)
-	    {
-		    print(Physics.Raycast(transform.position, Vector3.down, groundTolerance));
 		    return Physics.Raycast(transform.position, Vector3.down, groundTolerance);
-	    }
         else
             return true;
     }
