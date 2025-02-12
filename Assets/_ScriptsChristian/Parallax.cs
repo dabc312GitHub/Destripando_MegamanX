@@ -17,6 +17,6 @@ public class Parallax : MonoBehaviour
     void Update()
     {
         posX = Camera.position.x / cantidad;       
-        mat.mainTextureOffset = new Vector2(posX, 0);
+        mat.SetVector("_Offset",new Vector4(posX, 0,0,0));        
     }
 }
