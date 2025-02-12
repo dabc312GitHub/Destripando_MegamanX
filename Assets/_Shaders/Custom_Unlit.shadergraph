@@ -80,6 +80,9 @@
         },
         {
             "m_Id": "12157d6b5450426eb21d5aeb47c710cb"
+        },
+        {
+            "m_Id": "d95528728db14f629a4cbeb8b9cff553"
         }
     ],
     "m_GroupDatas": [],
@@ -245,8 +248,8 @@
     },
     "m_FragmentContext": {
         "m_Position": {
-            "x": 274.0000305175781,
-            "y": 199.99998474121095
+            "x": 447.99993896484377,
+            "y": 200.0
         },
         "m_Blocks": [
             {
@@ -936,6 +939,21 @@
     "m_ShaderOutputName": "Metallic",
     "m_StageCapability": 2,
     "m_Value": 1.0,
+    "m_DefaultValue": 0.0,
+    "m_Labels": []
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId": "6f661a1245854944952fe76e09238476",
+    "m_Id": 1,
+    "m_DisplayName": "Out",
+    "m_SlotType": 1,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Out",
+    "m_StageCapability": 3,
+    "m_Value": 0.0,
     "m_DefaultValue": 0.0,
     "m_Labels": []
 }
@@ -1650,6 +1668,21 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId": "d0908a03a565411294744f33242a12e0",
+    "m_Id": 0,
+    "m_DisplayName": "In",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "In",
+    "m_StageCapability": 3,
+    "m_Value": 1.0,
+    "m_DefaultValue": 0.0,
+    "m_Labels": []
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.BlockNode",
     "m_ObjectId": "d4ebbf380eaa4cb88cecd32cb56831a8",
     "m_Group": {
@@ -1693,6 +1726,49 @@
     "m_ShaderOutputName": "Sampler",
     "m_StageCapability": 3,
     "m_BareResource": false
+}
+
+{
+    "m_SGVersion": 1,
+    "m_Type": "UnityEditor.ShaderGraph.CustomFunctionNode",
+    "m_ObjectId": "d95528728db14f629a4cbeb8b9cff553",
+    "m_Group": {
+        "m_Id": ""
+    },
+    "m_Name": "FOG (Custom Function)",
+    "m_DrawState": {
+        "m_Expanded": true,
+        "m_Position": {
+            "serializedVersion": "2",
+            "x": -172.0,
+            "y": 247.99998474121095,
+            "width": 207.99998474121095,
+            "height": 245.9999542236328
+        }
+    },
+    "m_Slots": [
+        {
+            "m_Id": "d0908a03a565411294744f33242a12e0"
+        },
+        {
+            "m_Id": "6f661a1245854944952fe76e09238476"
+        }
+    ],
+    "synonyms": [
+        "code",
+        "HLSL"
+    ],
+    "m_Precision": 0,
+    "m_PreviewExpanded": false,
+    "m_DismissedVersion": 0,
+    "m_PreviewMode": 0,
+    "m_CustomColors": {
+        "m_SerializableColors": []
+    },
+    "m_SourceType": 1,
+    "m_FunctionName": "FOG",
+    "m_FunctionSource": "",
+    "m_FunctionBody": "unity_FogParams = half4(0.0, 0.0, 0.0, 1.0);\nOut = In;"
 }
 
 {
