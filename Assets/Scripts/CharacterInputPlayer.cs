@@ -13,8 +13,9 @@ public class CharacterInputPlayer : MonoBehaviour
     public float jumpVelocity = 7f;
     public float groundTolerance = 0.2f;
     public bool checkGroundForJump = true;
-	
-    
+	public float factorGravity = 1f;
+	public float factorMovement = 1f;
+
     float speed = 0f;
     bool isSprinting = false;
     Animator anim;
@@ -30,9 +31,14 @@ public class CharacterInputPlayer : MonoBehaviour
 
     private enum ObjectCollided
 	{
+		Shooter,
 		Ground,
-		Wall
+		Wall,
+		None
 	}
+
+	private bool isGroundCollided = false;
+	private bool isWallCollided = false;
 
 	private ObjectCollided _objectCollided;
 
@@ -42,6 +48,7 @@ public class CharacterInputPlayer : MonoBehaviour
 	    anim = GetComponent<Animator>();
 	    rigbody = GetComponent<Rigidbody>();
 	    targetRot = transform.rotation;        
+	    anim.SetBool("Jumping", true);
 	}
 	
 	// Update is called once per frame
@@ -85,56 +92,53 @@ public class CharacterInputPlayer : MonoBehaviour
 
 	private void MovePlayer(Vector2 inputPlayer)
 	{
-		// set speed to horizontal inputs
 		speed = Mathf.Abs(inputPlayer.x);
-		// if (!WallCollided)
-		// {
-		// speed = Mathf.SmoothDamp(anim.GetFloat("Speed"), speed, ref velocity, 0.1f);
-		print(previousTargetRot + " :Previous Current: " + targetRot);
-		var tempSpeed = speed;
-		print("speed: " + speed);
+		speed = Mathf.SmoothDamp(anim.GetFloat("Speed"), speed, ref velocity, 0.1f);
 		if (_objectCollided == ObjectCollided.Wall)
-		{
 			speed = 0;
-			print("speedTargetWall: " + speed);
-		}
-		else
-		{
-			print("_T_ _objectCollided: " + (_objectCollided == ObjectCollided.Wall));
-			print("_T_ previousTargetRot: " + (targetRot == previousTargetRot));
-		}
 
-		if (targetRot.eulerAngles.z != previousTargetRot.eulerAngles.z)
+		if (!isWallCollided)
 		{
-			speed = tempSpeed;
+			rigbody.linearVelocity = new Vector3(inputPlayer.x * factorMovement, rigbody.linearVelocity.y, 0);
 		}
-		
-		anim.SetFloat("Speed", speed);
-		// }
-	}
-	
+        anim.SetFloat("Speed", speed);
+    }
+	Vector3 PositionPlayer = Vector3.zero;
+	[SerializeField] private float jumpForce = 10f; // Fuerza máxima del salto
+	[SerializeField] private float jumpTime = 0.3f; // Tiempo máximo de salto
+	private float jumpTimer;
+	private bool isJumping = false;
     private void Update()
     {
-        // Jump
-	    if (isGrounded() && (Input.GetKeyDown(jumpJoystick) || Input.GetKeyDown(jumpKeyboard)))
+	    GroundedCheck();
+	    if (isGrounded && (Input.GetKeyDown(jumpJoystick) || Input.GetKeyDown(jumpKeyboard)))
 	    {
-		    rigbody.AddForce(new Vector3(0, jumpVelocity, 0), ForceMode.Impulse);
+		    rigbody.AddForce(new Vector3(0, jumpVelocity, 0), ForceMode.Acceleration);
+		    anim.SetTrigger("Jump");
+		    // anim.SetBool("Jumping", true);
 	    }
-	}
+	    if (!isGrounded)
+	    {
+		    // anim.SetBool("Jumping", false);
+		    anim.SetBool("Air", true);
+		    rigbody.AddForce(Vector3.down * (factorGravity * Physics.gravity.y), ForceMode.Acceleration);
+	    }
+    }
 
 
-    public bool isGrounded()
+    private bool isGrounded = false;
+    public void GroundedCheck()
     {
-	    if (checkGroundForJump)
-	    {
-		    return Physics.Raycast(
-			    transform.position,
-			    jumpDirection,
-			    groundTolerance
-		    );
-	    }
-        else
-            return true;
+	    isGrounded = Physics.Raycast(
+		    transform.position,
+		    jumpDirection,
+		    groundTolerance
+	    );
+	    print("isGrounded: " + isGrounded);
+	    // if (isGrounded)
+	    // {
+		   //  anim.SetTrigger("Ground");
+	    // }
     }
 
 
@@ -142,13 +146,41 @@ public class CharacterInputPlayer : MonoBehaviour
     {
 	    if (other.gameObject.CompareTag("Ground"))
 	    {
-		    _objectCollided = ObjectCollided.Ground;
+		    // _objectCollided = ObjectCollided.Ground;
+		    isGroundCollided = true;
+			anim.SetBool("Air", false);
+			anim.SetTrigger("Ground");
+			// anim.SetBool("Jumping", false);
+            // jumpDirection = Vector3.down;
+            print("coll Ground");
+	    }
+	    else if (other.gameObject.CompareTag("Wall"))
+	    {
+		    isWallCollided = true;
+		    // _objectCollided = ObjectCollided.Wall;
+		    // jumpDirection = Vector3.right;
+		    print("coll Wall");
+	    }
+		else
+		{
+            _objectCollided = ObjectCollided.None;
+            print("None wallground");
+        }
+    }
+
+    private void OnCollisionExit(Collision other)
+    {
+	    if (other.gameObject.CompareTag("Ground"))
+	    {
+		    // _objectCollided = ObjectCollided.Ground;
+		    isGroundCollided = false;
 		    // jumpDirection = Vector3.down;
 		    print("coll Ground");
 	    }
 	    else if (other.gameObject.CompareTag("Wall"))
 	    {
-		    _objectCollided = ObjectCollided.Wall;
+		    isWallCollided = false;
+		    // _objectCollided = ObjectCollided.Wall;
 		    // jumpDirection = Vector3.right;
 		    print("coll Wall");
 	    }
