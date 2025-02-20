@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 713e0022c0ffe974bb14d5e0611b0797, type: 3}
+  m_Name: NewMasterSequence
+  m_EditorClassIdentifier: 
+  m_RootIndex: 0
+  m_Manager:
+    rid: 3467451015348617216
+  references:
+    version: 2
+    RefIds:
+    - rid: 3467451015348617216
+      type: {class: SequenceManager, ns: UnityEngine.Sequences, asm: Unity.Sequences}
+      data:
+        m_Data:
+        - rid: 3467451015348617217
+        - rid: 3467451015632257118
+        m_AvailableIndices:
+          rid: 3467451015632257114
+    - rid: 3467451015348617217
+      type: {class: TimelineSequence, ns: UnityEngine.Sequences, asm: Unity.Sequences}
+      data:
+        m_Name: NewMasterSequence
+        m_Fps: 60
+        m_Start: 0
+        m_Duration: 2
+        m_Parent: -1
+        m_Children: 01000000
+        m_Timeline: {fileID: 11400000, guid: b3d6f6912726d3040b807c2f9bfc5904, type: 2}
+        m_ChildrenTrack: {fileID: 9086478375061986460, guid: b3d6f6912726d3040b807c2f9bfc5904, type: 2}
+        m_DefaultChildrenTrackName: Sequences
+        m_EditorialClipAsset: {fileID: 0}
+    - rid: 3467451015632257114
+      type: {class: StackInt, ns: UnityEngine.Sequences, asm: Unity.Sequences}
+      data: 
+    - rid: 3467451015632257118
+      type: {class: TimelineSequence, ns: UnityEngine.Sequences, asm: Unity.Sequences}
+      data:
+        m_Name: VehiculosSequence
+        m_Fps: -1
+        m_Start: 0
+        m_Duration: 2
+        m_Parent: 0
+        m_Children: 
+        m_Timeline: {fileID: 11400000, guid: 7f3818056774db3429def5c93d2ffc13, type: 2}
+        m_ChildrenTrack: {fileID: 0}
+        m_DefaultChildrenTrackName: Sequences
+        m_EditorialClipAsset: {fileID: 4821596392868321813, guid: b3d6f6912726d3040b807c2f9bfc5904, type: 2}
