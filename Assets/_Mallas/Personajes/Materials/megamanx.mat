@@ -103,12 +103,12 @@ Material:
     - _BlendModePreserveSpecular: 1
     - _Brillar: 0
     - _BumpScale: 1
-    - _Carga: 0
+    - _Carga: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
-    - _Damage: 1
+    - _Damage: 0
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
