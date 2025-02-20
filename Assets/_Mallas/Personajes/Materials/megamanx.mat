@@ -101,12 +101,14 @@ Material:
     - _Ambient: 0.362
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
-    - _Brillar: 2
+    - _Brillar: 0
     - _BumpScale: 1
+    - _Carga: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
+    - _Damage: 0
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
@@ -136,6 +138,8 @@ Material:
     - _BaseColor: {r: 0.9063317, g: 0.9063317, b: 0.9063317, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _ColorBrilo: {r: 0.49463546, g: 2.772372, b: 2.9960783, a: 0}
+    - _ColorDamage: {r: 5.992157, g: 3.8231854, b: 1.0458012, a: 0}
+    - _Color_1: {r: 0.8018868, g: 0.5228478, b: 0.08699717, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
