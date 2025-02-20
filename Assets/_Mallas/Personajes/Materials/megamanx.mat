@@ -101,7 +101,7 @@ Material:
     - _Ambient: 0.362
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
-    - _Brillar: 2
+    - _Brillar: 0
     - _BumpScale: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
