@@ -51756,7 +51756,7 @@ Animator:
   m_GameObject: {fileID: 1973843157}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: f52aad4dd52b2d04b90cbb997996c398, type: 3}
-  m_Controller: {fileID: 9100000, guid: a1ac5f83775fc76498f51ec2e4b9d3c0, type: 2}
+  m_Controller: {fileID: 9100000, guid: d047f4f648ad2ba4c80ea44a3251f8c7, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 1
   m_ApplyRootMotion: 0
@@ -51832,7 +51832,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   jumpKeyboard: 120
   fireShooting: 115
-  jumpVelocity: 0.1
+  jumpVelocity: 0.23
   groundTolerance: 0.1
   checkGroundForJump: 1
   factorGravity: 1
@@ -51849,7 +51849,7 @@ MonoBehaviour:
   bulletSpeed_3: 15
   jumpForce: 10
   jumpTime: 0.3
-  limitJumping: 1
+  limitJumping: 0.9
 --- !u!1001 &1979312540
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -217,13 +217,15 @@ public class CharacterInputPlayer : MonoBehaviour
     {	
 	    GroundedCheck();
 
-	    if (isGrounded && !isJumpingUp && Input.GetKeyDown(jumpKeyboard))
+	    if (isGrounded && Input.GetKeyDown(jumpKeyboard))
 	    {
 		    isJumpingUp = true;
 		    jumpAxisY = transform.localPosition.y;
 		    GetComponent<Rigidbody>().useGravity = false;
+		    speed = 0;
 		    anim.SetBool("IdleWalk", false); 
 		    anim.SetTrigger("Jump");
+		    isOnceGrounded = false;
 	    }
 	    if (isJumpingUp && Input.GetKey(jumpKeyboard))
 	    {
@@ -235,6 +237,7 @@ public class CharacterInputPlayer : MonoBehaviour
 		    {
 			    GetComponent<Rigidbody>().useGravity = true;
 			    anim.SetBool("Air", true);
+			    
 		    }
 
 
@@ -256,6 +259,7 @@ public class CharacterInputPlayer : MonoBehaviour
 
 
     private bool isGrounded = false;
+    bool isOnceGrounded = false;
     public void GroundedCheck()
     {
 	    bool wasGrounded = isGrounded;
@@ -274,7 +278,13 @@ public class CharacterInputPlayer : MonoBehaviour
 		    else
 		    {
 			    anim.SetBool("Air", false);
+		    }
+
+		    if (!isOnceGrounded)
+		    {
+			    isOnceGrounded = true;
 			    anim.SetBool("IdleWalk", true);    
+			    anim.SetTrigger("IdleWalkTr");    
 		    }
 	    }
     }

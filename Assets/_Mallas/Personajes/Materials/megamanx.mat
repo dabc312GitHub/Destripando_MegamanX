@@ -103,7 +103,7 @@ Material:
     - _BlendModePreserveSpecular: 1
     - _Brillar: 0
     - _BumpScale: 1
-    - _Carga: 1
+    - _Carga: 0
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
