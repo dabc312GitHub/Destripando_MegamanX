@@ -267,6 +267,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   explosion: {fileID: 4701659688279944157, guid: ebdf0fcf4734db642a42aba268baed86, type: 3}
   gunVoltProyectil: {fileID: 4391251812176570487, guid: 8ae01a88dc2a9db418f5326953a8ebdd, type: 3}
+  gunVoltEnergia: {fileID: 7495124846881752760, guid: 33727ce72c6213f46b6cceea5e42156c, type: 3}
   salidas:
   - {fileID: 8016133117809533741}
   - {fileID: 2141328086707769180}
