@@ -8,6 +8,7 @@ public class Impacto : MonoBehaviour
     [SerializeField] private Material vidaUI;
     [SerializeField] private Material megamanMatA;
     [SerializeField] private Material megamanMatB;
+    [SerializeField] private float segInvencible = 2.0f;
     private Material controlImpacto;
     private Animator animator;
     private float vida = 10f;
@@ -19,6 +20,11 @@ public class Impacto : MonoBehaviour
         Reset();
         animator = GetComponent<Animator>();
         vidaUI.SetFloat("_Salud", 1.0f);
+    }
+
+    public float getSegInvencible()
+    {
+        return segInvencible;
     }
 
     public Material getMaterialA()

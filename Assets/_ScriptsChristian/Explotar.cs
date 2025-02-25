@@ -6,7 +6,7 @@ public class Explotar : MonoBehaviour
 {
   
    [SerializeField] private Transform explosion;
-   [SerializeField] private float segundosInvencible = 4.0f;
+   private float segundosInvencible;
    private static bool invulnerable = false;
    private Material matA, matB;
 
@@ -17,6 +17,7 @@ public class Explotar : MonoBehaviour
         ImpactoScript = GameObject.Find("megamanxCompleto").GetComponent<Impacto>();
         matA = ImpactoScript.getMaterialA();
         matB = ImpactoScript.getMaterialB();
+        segundosInvencible = ImpactoScript.getSegInvencible();
    }
 
    void OnTriggerEnter(Collider Col) 
