@@ -274,6 +274,7 @@ MonoBehaviour:
   - {fileID: 1890990299901915157}
   - {fileID: 3827986988687900428}
   - {fileID: 7054164099710307345}
+  velocidadProyectiles: 0
 --- !u!1 &760800035815140248 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 221426371191225869, guid: b183f414a72aaae4096181261108cc15, type: 3}
@@ -294,7 +295,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3

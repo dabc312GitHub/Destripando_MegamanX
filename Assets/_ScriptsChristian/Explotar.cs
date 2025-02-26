@@ -10,13 +10,15 @@ public class Explotar : MonoBehaviour
    private static bool invulnerable = false;
    private Material matA, matB;
 
-   private Impacto ImpactoScript;
+   private  Impacto ImpactoScript;
 
    void Start()
    {
         ImpactoScript = GameObject.Find("megamanxCompleto").GetComponent<Impacto>();
         matA = ImpactoScript.getMaterialA();
         matB = ImpactoScript.getMaterialB();
+        //matA.SetFloat("_Invulnerable",1.0f); // si se utiliza aqui se malogra???
+        //matB.SetFloat("_Invulnerable",1.0f);
         segundosInvencible = ImpactoScript.getSegInvencible();
    }
 
@@ -29,6 +31,7 @@ public class Explotar : MonoBehaviour
                 Explota();
                 Col.transform.parent.GetComponent<Animator>().SetTrigger("Damage");
                 invulnerable = true;
+                ImpactoScript.getExtension().enabled = false;   
                 matA.SetFloat("_Invulnerable",1.0f);
                 matB.SetFloat("_Invulnerable",1.0f);
                 StartCoroutine("Invulnerable");
@@ -45,10 +48,13 @@ public class Explotar : MonoBehaviour
 
    public IEnumerator Invulnerable()
    {   
+    
         yield return new WaitForSeconds(segundosInvencible);
         invulnerable = false;
         matA.SetFloat("_Invulnerable",0.0f);
-        matB.SetFloat("_Invulnerable",0.0f);         
+        matB.SetFloat("_Invulnerable",0.0f);   
+        ImpactoScript.getExtension().enabled =true;   
+        
         yield return null;
    }
 

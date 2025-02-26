@@ -11,6 +11,7 @@ public class Impacto : MonoBehaviour
     [SerializeField] private float segInvencible = 2.0f;
     private Material controlImpacto;
     private Animator animator;
+    private Collider extension;
     private float vida = 10f;
 
     void Start()
@@ -20,6 +21,16 @@ public class Impacto : MonoBehaviour
         Reset();
         animator = GetComponent<Animator>();
         vidaUI.SetFloat("_Salud", 1.0f);
+        extension = transform.GetChild(4).GetComponent<Collider>();
+
+        megamanMatA.SetFloat("_Invulnerable",0.0f); // y aqui creo qe no se malogra?
+        megamanMatB.SetFloat("_Invulnerable",0.0f);
+
+    }
+
+    public Collider getExtension()
+    {
+        return extension;
     }
 
     public float getSegInvencible()
@@ -49,16 +60,15 @@ public class Impacto : MonoBehaviour
         {
             mat.SetFloat("_Damage",1.0f);
             controlImpacto.SetFloat("_Impacto",1.0f);
-            megamanMatA.SetFloat("_Invulnerable",1.0f);
-            megamanMatB.SetFloat("_Invulnerable",1.0f);
+            //megamanMatA.SetFloat("_Invulnerable",1.0f);
+            //megamanMatB.SetFloat("_Invulnerable",1.0f);
 
 
-            //temporal
+         //temporal
             vida -= 3; 
+            vidaUI.SetFloat("_Salud", vida/10f);
         if( vida <= 0)
-            Muerte();                  
-            
-        vidaUI.SetFloat("_Salud", vida/10f);
+            Muerte(); 
         // temporal
 
         }
@@ -70,18 +80,19 @@ public class Impacto : MonoBehaviour
         vida -= d; 
         if( vida <= 0)
             Muerte();                  
-            
-        vidaUI.SetFloat("_Salud", vida/10f);
+        else
+            vidaUI.SetFloat("_Salud", vida/10f);
 
     }
 
 
     void Muerte()
     {
+        vidaUI.SetFloat("_Salud", 0.0f);
         muerte.gameObject.SetActive(true);
         transform.GetChild(0).gameObject.SetActive(false);
-        transform.GetChild(5).gameObject.SetActive(false); // collider ancho...
-        vidaUI.SetFloat("_Salud", 0.0f);
+        transform.GetChild(4).gameObject.SetActive(false); // collider ancho...
+        
         // UI game Over, en realidad pantalla se pone en blanco gradualmente y si fueron 3 veces sale ventana de password
     }
 
@@ -89,8 +100,9 @@ public class Impacto : MonoBehaviour
     {
         if(mat)
         {
-            mat.SetFloat("_Damage",0.0f);
-           controlImpacto.SetFloat("_Impacto",0.0f);            
+           mat.SetFloat("_Damage",0.0f);
+           controlImpacto.SetFloat("_Impacto",0.0f);
+           megamanMatB.SetFloat("_Carga",0.0f);            
         }
     }
    
