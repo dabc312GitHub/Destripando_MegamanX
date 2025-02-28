@@ -52773,6 +52773,63 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6968288622570354657}
   m_Mesh: {fileID: -9159120442324085916, guid: a838282a11c80ce4e9ef99efc42c4afa, type: 3}
+--- !u!1001 &6210232370897419484
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 7320361596161727220, guid: 6a0eefab568bb6a49ba9469e5fb6bfc9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.43
+      objectReference: {fileID: 0}
+    - target: {fileID: 7320361596161727220, guid: 6a0eefab568bb6a49ba9469e5fb6bfc9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7320361596161727220, guid: 6a0eefab568bb6a49ba9469e5fb6bfc9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -2.228
+      objectReference: {fileID: 0}
+    - target: {fileID: 7320361596161727220, guid: 6a0eefab568bb6a49ba9469e5fb6bfc9, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 7320361596161727220, guid: 6a0eefab568bb6a49ba9469e5fb6bfc9, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7320361596161727220, guid: 6a0eefab568bb6a49ba9469e5fb6bfc9, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 7320361596161727220, guid: 6a0eefab568bb6a49ba9469e5fb6bfc9, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7320361596161727220, guid: 6a0eefab568bb6a49ba9469e5fb6bfc9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7320361596161727220, guid: 6a0eefab568bb6a49ba9469e5fb6bfc9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 7320361596161727220, guid: 6a0eefab568bb6a49ba9469e5fb6bfc9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7988531120659611726, guid: 6a0eefab568bb6a49ba9469e5fb6bfc9, type: 3}
+      propertyPath: m_Name
+      value: roadAttackers
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6a0eefab568bb6a49ba9469e5fb6bfc9, type: 3}
 --- !u!4 &6384648202418295894
 Transform:
   m_ObjectHideFlags: 0
@@ -53480,3 +53537,4 @@ SceneRoots:
   - {fileID: 4398876139799820425}
   - {fileID: 1954626016069395938}
   - {fileID: 7396954852117595828}
+  - {fileID: 6210232370897419484}
