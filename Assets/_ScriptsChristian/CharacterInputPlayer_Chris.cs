@@ -9,41 +9,33 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 	[Header("Input")]
     public KeyCode jumpKeyboard = KeyCode.Space;
     public KeyCode fireShooting = KeyCode.X;
-    public float jumpVelocity = 7f;
+    public float jumpFactor;
+ 	private float ySpeed;
     public float groundTolerance = 0.2f;
-    public bool checkGroundForJump = true;
+
 	public float factorGravity = 1f;
-	public float factorMovement = 1f;
+	public float moveSpeed = 1f;
 
-	public Material shBrightMesh;
 
-	public GameObject goAuraCharger;
-	// public GameObject chargerParticles;
-	// public GameObject projectileBasic;
-	// public GameObject projectileMedium;
-	// public GameObject projectileHard;
-	// public Transform firePoint; // Punto de salida de las balas
-	// public float bulletSpeed = 10f; // Velocidad de la bala
+	public GameObject particulasCarga;
 	
-	
+		
 	public GameObject bulletBase; // Prefab de la bala base
 	public GameObject bullet2;    // Prefab de la bala 2
 	public GameObject bullet3;    // Prefab de la bala 3
 
 	public Transform firePoint;   // Punto de origen del disparo
-	public float fireRate = 0.5f; // Tiempo entre disparos
+	
 	public float bulletSpeed_1 = 5f; 
 	public float bulletSpeed_2 = 10f; 
 	public float bulletSpeed_3 = 15f; 
 
-	private float nextFireTime = 0f;
-	private int currentBulletIndex = 0; // Índice de la bala actual
-	private Rigidbody bulletRigidbody;
+	
 
-    float speed = 0f;
+  
     bool isSprinting = false;
     Animator anim;
-    Vector2 input;
+    private Vector3 inputVec;
     float velocity;
     bool headingLeft = false;
     Quaternion targetRot;
@@ -52,6 +44,8 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
     
     Vector3 jumpDirection = Vector3.down;
     bool GrounCollided = false;
+
+    Vector3 velocityV = Vector3.zero;
 
     private enum ObjectCollided
 	{
@@ -66,132 +60,215 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 
 	private ObjectCollided _objectCollided;
 
-	private Material VFX_mesh; 
+	private Material VFX_brilloCarga;
+
+
+	Vector3 PositionPlayer = Vector3.zero;
 	
-	// Use this for initialization
+	
+
+	private bool isJumping = false;	
+	private bool isJumpingUp = false;
+	
+	float jumpAxisY = 0.0f;
+	public float limitJumping = 5.0f;
+
+	GameObject bullet = null;
+	private float _counterFireShooting = 0.0f;
+
+
+		
+	private Color chargerColor_1 = new Color(0, 191, 74, 255) / 255f *3f;
+	private Color chargerColor_2 = Color.red * 2f;	
+	private Material colorCargaMat;
+
 	void Start ()
 	{
-		_particleChargerColor = goAuraCharger.GetComponent<ParticleSystemRenderer>();
+		
 	    anim = GetComponent<Animator>();
 	    rigbody = GetComponent<Rigidbody>();
 	    targetRot = transform.rotation;        
 	    
 	    //anim.SetBool("Jumping", true);
 
-	    VFX_mesh = transform.GetChild(0).GetComponent<Renderer>().sharedMaterial;
-	    // VFX_mesh.SetFloat("_Brillar", 1.0f);
+	    VFX_brilloCarga = transform.GetChild(0).GetComponent<Renderer>().sharedMaterial;
+
+	    colorCargaMat =particulasCarga.GetComponent<ParticleSystemRenderer>().sharedMaterial;
+
+	    colorCargaMat.SetColor("_Color", chargerColor_1);
+
+	    inputVec = new Vector3(0,0,0);
+
+	    
 	}
-	GameObject bullet = null;
-	private float _counterFireShooting = 0.0f;
 
-	private bool _isShootingOn = false; 
-	private bool _isShootingOff = false; 
-		
-	private Color chargerColor_1 = new Color(0, 191, 74, 255) / 255f *3f;
-	private Color chargerColor_2 = Color.yellow * 1.2f;
-	ParticleSystemRenderer _particleChargerColor = new();
-	// Update is called once per frame
-	void FixedUpdate ()
+	void RotatePlayer()
 	{
+		if ((inputVec.x < 0f && !headingLeft) || (inputVec.x > 0f && headingLeft))
+		{
+						
+			if (inputVec.x < 0f)
+			{
+				targetRot = Quaternion.Euler(0, 270, 0);
+			}
 
+			if (inputVec.x > 0f)
+			{
+				targetRot = Quaternion.Euler(0, 90, 0);
+			}
+			headingLeft = !headingLeft;
+		}
+		
+		transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime * 20f);
+		
+	}
 
-		// goAuraCharger.GetComponent<ParticleSystemRenderer>().sharedMaterial.SetColor("_Color", chargerColor_2);
-		// goAuraCharger.GetComponent<ParticleSystemRenderer>().sharedMaterial.SetColor("_EmissionColor", Color.red);
+	void MovePlayer()
+	{
+		float speed = Mathf.Abs(inputVec.x);
+		speed = Mathf.SmoothDamp(anim.GetFloat("Speed"), speed, ref velocity, 0.1f);
+		if (_objectCollided == ObjectCollided.Wall)
+			speed = 0;
 
-		//print("firePoint.right: "+firePoint.right.z);
-		input.x = Input.GetAxis("Horizontal");
+		if (!isWallCollided)
+			transform.position += new Vector3(inputVec.x * moveSpeed,0,0) *Time.deltaTime;
+		
+        anim.SetFloat("Speed", speed);
+		
+	}
 
-		RotatePlayer(input);
-		MovePlayer(input);
+	void Update()
+	{		
+		inputVec.x = Input.GetAxis("Horizontal");
+		inputVec.y = Input.GetAxis("Vertical");
+
+		MovePlayer();
+		RotatePlayer();
+		
 
 		float signo = Mathf.Sign(transform.forward.x); 
-
 		
 
-		if (Input.GetKey(fireShooting))
+		if (Input.GetKey(fireShooting))  //ideal seria un valor continuo para que sea suave
+		{
 			anim.SetLayerWeight(1, 1.0f);
-		else
-			anim.SetLayerWeight(1, 0.0f); 
+			_counterFireShooting += Time.deltaTime;
 
-		if (!_isShootingOn && Input.GetKeyDown(fireShooting))
-		{
 
-			_isShootingOn = true;
-			_isShootingOff = false;
-			_counterFireShooting = 0.0f;
-			 VFX_mesh.SetFloat("_Carga", 1.0f);
-			
-			bulletBase.gameObject.SetActive(false);
-			bullet2.gameObject.SetActive(false);
-			bullet3.gameObject.SetActive(false);
-		}
-		if (!_isShootingOff && Input.GetKeyUp(fireShooting))
-		{
-			_isShootingOn = false;
-			_isShootingOff = true;
-			 VFX_mesh.SetFloat("_Carga", 0.0f);
-			
-			shBrightMesh.SetFloat("_Carga", 0.0f);
-
-			
-			
-			if (_counterFireShooting < 60f)
-			{
-				// bulletBase.gameObject.SetActive(true);
-				bullet = Instantiate(bulletBase, firePoint.position, Quaternion.Euler(0, 90 * signo , 0));  //
+			if (Input.GetKeyDown(fireShooting))
+			{				
+				bullet = Instantiate(bulletBase, firePoint.position, Quaternion.Euler(0, 90 * signo , 0));  
 				bullet.gameObject.SetActive(true);
 				bullet.transform.position = firePoint.position;
 				bullet.GetComponent<Rigidbody>().linearVelocity = Vector3.right * (firePoint.right.z * bulletSpeed_1);
-				
+
 			}
-			else if (_counterFireShooting >= 60f && _counterFireShooting < 120f)
+
+			if(_counterFireShooting > 0.8f)
 			{
-				// bullet2.gameObject.SetActive(true);
+				VFX_brilloCarga.SetFloat("_Carga", 1.0f);
+				particulasCarga.SetActive(true);
+			}
+
+			if(_counterFireShooting > 4)
+			{				
+				colorCargaMat.SetColor("_Color", chargerColor_2);
+			}
+				
+				
+		}
+		else
+			anim.SetLayerWeight(1, 0.0f);
+
+		if( Input.GetKeyUp(fireShooting))
+		{
+			Debug.Log(_counterFireShooting);
+		
+			if (_counterFireShooting >= 2f && _counterFireShooting < 4)
+			{				
+
 				bullet = Instantiate(bullet2, firePoint.position, Quaternion.Euler(0, 90 *signo, 0));
 				bullet.gameObject.SetActive(true);
 				bullet.transform.position = firePoint.position;
 				
 				bullet.GetComponent<Rigidbody>().linearVelocity = Vector3.right * (firePoint.right.z * bulletSpeed_2);
-
-				
-
-				goAuraCharger.SetActive(false);
-			}
-			else if (_counterFireShooting >= 120f)
+				particulasCarga.SetActive(false);
+			}		
+			else if ( _counterFireShooting >= 4 )
 			{
-				// bullet3.gameObject.SetActive(true);
+						
 				bullet = Instantiate(bullet3, firePoint.position, Quaternion.Euler(0, 90 * signo, 0));
 				bullet.gameObject.SetActive(true);
 				bullet.transform.position = firePoint.position;
 				
-				bullet.GetComponent<Rigidbody>().linearVelocity = Vector3.right * (firePoint.right.z * bulletSpeed_3);
-				
-
-				goAuraCharger.SetActive(false);
+				bullet.GetComponent<Rigidbody>().linearVelocity = Vector3.right * (firePoint.right.z * bulletSpeed_3); //buscar forma sin rigidbody para balas porsiaca
+				particulasCarga.SetActive(false);				
 			}
+
+			_counterFireShooting = 0.0f;
+			VFX_brilloCarga.SetFloat("_Carga", 0.0f);
+			 colorCargaMat.SetColor("_Color", chargerColor_1);
+			particulasCarga.SetActive(false);
 		}
 
-		if (_isShootingOn && !_isShootingOff)
+
+
+		//************************* MOVIMIENTO //////////////////////////// 
+
+		Vector3 posSuelo = Vector3.zero;
+		//bool saltando = false;
+		if(isGrounded)
 		{
-			_counterFireShooting += 1.0f;
-			if (_counterFireShooting == 60f)
-			{
-				shBrightMesh.SetFloat("_Carga", 1.0f);
-				goAuraCharger.SetActive(true);
-				_particleChargerColor.material.SetColor("_Color", chargerColor_1);
-			}
-			else if (_counterFireShooting == 120f)
-			{
-				goAuraCharger.SetActive(true);
-				_particleChargerColor.material.SetColor("_Color", chargerColor_2);
-			}
+			posSuelo = transform.localPosition;
+			anim.SetBool("Air", false);
 		}
-		//print("counterFireShooting: "+_counterFireShooting);
+		else // caso suelo se caiga? o camines al borde y caigas
+		{			
+			anim.SetBool("Air", true);
+		}
 
+		if( inputVec.y > 0) // puedo saltar mientras caigo, si pongo isGrounded ya no pero el salto lo hace a medias >:( ?? o no?
+		{
+			anim.SetTrigger("Jump");
+			anim.SetBool("Air", true);
+			anim.SetBool("IdleWalk", false);				
+			if(transform.localPosition.y <  (posSuelo  + new Vector3(0,1.5f,0)).y  )	//convertir altura en variable luego, funciona bien pero en cima vibra un poco	
+				transform.localPosition = Vector3.SmoothDamp(transform.localPosition, transform.localPosition + new Vector3(0,1.5f,0) , ref velocityV, jumpFactor* Time.deltaTime );
+		}
+		else
+		{
+			anim.SetBool("IdleWalk", true);
+
+			/*
+			speed = Mathf.Abs(inputPlayer.x);
+			speed = Mathf.SmoothDamp(anim.GetFloat("Speed"), speed, ref velocity, 0.1f);
+				
+        	anim.SetFloat("Speed", speed);	*/
+		}
+
+
+		
+
+	}
+	
+	void FixedUpdate ()
+	{
 
 		GroundedCheck();
 
+		
 
+
+/*
+		if( Input.GetKeyUp(jumpKeyboard))
+		{
+			 GetComponent<Rigidbody>().useGravity = true;
+		}*/
+
+
+
+
+		/*
 	    if (Input.GetKeyUp(jumpKeyboard))
 	    {
 	    	Debug.Log("saltando");
@@ -215,12 +292,13 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 		    anim.SetBool("IdleWalk", false); 
 		    anim.SetTrigger("Jump");
 	    }
-	    if (isJumpingUp && Input.GetKey(jumpKeyboard))
+	    if ( !isGrounded && isJumpingUp && Input.GetKey(jumpKeyboard))
 	    {
 		    if (transform.localPosition.y <= jumpAxisY + limitJumping)
 		    {
 		    	Debug.Log("ojoo");
-			    transform.localPosition += Vector3.up * Time.deltaTime * -Physics.gravity.y * jumpVelocity;
+			    //transform.localPosition += Vector3.up * Time.deltaTime * -Physics.gravity.y * jumpVelocity;
+			    transform.localPosition = Vector3.SmoothDamp(transform.localPosition, transform.localPosition + new Vector3(0,1.5f,0) , ref velocityV, jumpVelocity* Time.deltaTime );
 		    }
 		    else
 		    {
@@ -228,75 +306,29 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 			    anim.SetBool("Air", true);
 		    }
 
-	    }
+	    }*/
 		
 
 	}
-	
+
+	private bool isGrounded = false;
+
+    public void GroundedCheck()
+    {
+    	 isGrounded = Physics.Raycast(
+		    transform.position + new Vector3(0,0.05f,0),
+		    jumpDirection,
+		    groundTolerance
+	    );
+    	  print("isGrounded: " + isGrounded);
 
 
+    	 // isJumpingUp= !isGrounded;
 
-
-	private void RotatePlayer(Vector2 inputPlayer)
-	{
-		// Check if direction changes
-		if ((inputPlayer.x < 0f && !headingLeft) || (inputPlayer.x > 0f && headingLeft))
-		{
-			previousTargetRot = targetRot;
-			print("Previous Rotation: " + previousTargetRot);
-			if (inputPlayer.x < 0f)
-			{
-				targetRot = Quaternion.Euler(0, 270, 0);
-			}
-
-			if (inputPlayer.x > 0f)
-			{
-				targetRot = Quaternion.Euler(0, 90, 0);
-			}
-			headingLeft = !headingLeft;
-		}
-		// Rotate player if direction changes
-		transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime * 20f);
-		print("Rotation: " + transform.rotation);
-	}
-
-	private void MovePlayer(Vector2 inputPlayer)
-	{
-		speed = Mathf.Abs(inputPlayer.x);
-		speed = Mathf.SmoothDamp(anim.GetFloat("Speed"), speed, ref velocity, 0.1f);
-		if (_objectCollided == ObjectCollided.Wall)
-			speed = 0;
-
-		if (!isWallCollided)
-		{
-			//rigbody.linearVelocity = new Vector3(inputPlayer.x * factorMovement, rigbody.linearVelocity.y, 0); 
-			//rigbody.AddForce(transform.forward * factorMovement);
-			transform.position += new Vector3(inputPlayer.x * factorMovement,0,0) *0.01f; // *timedeltatime?
-		}
-        anim.SetFloat("Speed", speed);
-    }
-	Vector3 PositionPlayer = Vector3.zero;
-	[SerializeField] private float jumpForce = 10f; // Fuerza máxima del salto
-	[SerializeField] private float jumpTime = 0.3f; // Tiempo máximo de salto
-	private float jumpTimer;
-	private bool isJumping = false;
-	
-	private bool isJumpingUp = false;
-	private bool isFallingDown = false;
-	float jumpAxisY = 0.0f;
-	public float limitJumping = 5.0f;
-   
-
-    private void Update()
-    {		    
-
-		
-	   
 
     }
 
-
-    private bool isGrounded = false;
+/*
     public void GroundedCheck()
     {
 	    bool wasGrounded = isGrounded;
@@ -322,6 +354,52 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 		    }
 	    }
     }
+*/
+
+	
+
+
+
+/*
+	private void RotatePlayer(Vector2 inputPlayer)
+	{
+		// Check if direction changes
+		if ((inputPlayer.x < 0f && !headingLeft) || (inputPlayer.x > 0f && headingLeft))
+		{
+			previousTargetRot = targetRot;
+			//print("Previous Rotation: " + previousTargetRot);
+			if (inputPlayer.x < 0f)
+			{
+				targetRot = Quaternion.Euler(0, 270, 0);
+			}
+
+			if (inputPlayer.x > 0f)
+			{
+				targetRot = Quaternion.Euler(0, 90, 0);
+			}
+			headingLeft = !headingLeft;
+		}
+		// Rotate player if direction changes
+		transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime * 20f);
+		//print("Rotation: " + transform.rotation);
+	}
+
+	private void MovePlayer(Vector2 inputPlayer)
+	{
+		speed = Mathf.Abs(inputPlayer.x);
+		speed = Mathf.SmoothDamp(anim.GetFloat("Speed"), speed, ref velocity, 0.1f);
+		if (_objectCollided == ObjectCollided.Wall)
+			speed = 0;
+
+		if (!isWallCollided)
+		{
+			//rigbody.linearVelocity = new Vector3(inputPlayer.x * factorMovement, rigbody.linearVelocity.y, 0); 
+			//rigbody.AddForce(transform.forward * factorMovement);
+			transform.position += new Vector3(inputPlayer.x * factorMovement,0,0) *Time.deltaTime;
+		}
+        anim.SetFloat("Speed", speed);
+    }
+	   */
 
 
     private void OnCollisionEnter(Collision other)
