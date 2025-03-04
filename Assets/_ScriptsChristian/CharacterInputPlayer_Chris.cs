@@ -233,7 +233,7 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 		
 		ySpeed += Physics.gravity.y * Time.deltaTime;
 
-		
+		bool deslizar = false;
 
 		if(isGrounded)
 		{
@@ -256,32 +256,57 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 		}
 		else
 		{
+
 			anim.SetBool("Air", true);
 			anim.SetBool("IdleWalk", false);
 			if(isWallCollided)
 			{
-				//ySpeed = 0.1f;
+				
 				anim.SetBool("Air", true);
-				anim.SetBool("Wall", true);
-				moveVector.x = -(transform.forward.x) * inputVec.x * 1.0f;
+				anim.SetBool("Wall", true);			
+				
+				moveVector.y =  -Mathf.Abs(inputVec.x);
+				deslizar= true;
+				if (Mathf.Abs(moveVector.x) < 1f) //si dejo de moverme hacia adelante chocando con pared en aire
+				{
+					moveVector.x = -(transform.forward.x) * /*Mathf.Abs(inputVec.x) **/ 5.0f; //mover un poco en direccion opuesta a la pared, funciona?
+					deslizar = false;
+					ySpeed = jumpSpeed/jumpHeight;
+
+				}
+
 				if(inputVec.y > 0) 
 				{
-					moveVector.x = -(transform.forward.x) * inputVec.x * 10.0f;
+					moveVector.x = -(transform.forward.x) /** Mathf.Abs(inputVec.x)*/ * 20.0f;// funciona como deberia?
 					ySpeed = jumpSpeed;
 					anim.SetTrigger("Jump");
 					anim.SetBool("Air", true);
 					anim.SetBool("IdleWalk", false);
+					deslizar = false;
 				}
-				else 
-					ySpeed = 0;
+				
+					
 			} 
 
 			else
+			{
 				anim.SetBool("Wall", false);
-		}
-		
+				anim.SetBool("Air", true);
+				if (Mathf.Abs(moveVector.x) < 1f) //si dejo de moverme hacia adelante chocando con pared en aire
+				{
+					deslizar = false;
+					//moveVector.y = ySpeed * jumpHeight;
+					//moveVector.y = 0;//0.01f; // caida libre?
+					
 
-		moveVector.y = ySpeed * jumpHeight;
+				}
+
+			}
+		}
+
+				
+		if(!deslizar)//!isWallCollided)
+			moveVector.y = ySpeed * jumpHeight;
 		MovePlayer(moveVector* Time.deltaTime);		
 		RotatePlayer();
 		Disparar();		
@@ -369,12 +394,18 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
     public void WallCheck()
     {
     	Vector3 centro = transform.position + new Vector3(0,0.5f,0);
+    	RaycastHit hit;
     	float distancia = 0.5f;
     	isWallCollided = Physics.Raycast(
 		    centro, 
 		    transform.forward,
+		   	out hit,
 		    distancia
 	    );
+
+    	if ( isWallCollided && !hit.transform.gameObject.CompareTag("Wall") )
+    		isWallCollided = false;
+
     	Debug.Log("hay pared?: " + isWallCollided);
     	Debug.DrawRay(centro , transform.forward * distancia, Color.yellow); 
     }
