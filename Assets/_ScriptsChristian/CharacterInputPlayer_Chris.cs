@@ -134,14 +134,18 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 	{
 		float speed = Mathf.Abs(inputVec.x);
 		speed = Mathf.SmoothDamp(anim.GetFloat("Speed"), speed, ref velocity, 0.1f);
-		if (_objectCollided == ObjectCollided.Wall)
-			speed = 0;
+		if (isWallCollided)// (_objectCollided == ObjectCollided.Wall) //Funciona?
+		{			
+			//speed = Mathf.SmoothDamp(anim.GetFloat("Speed"),0, ref velocity, 0.1f);
+			speed = Mathf.Lerp(anim.GetFloat("Speed"),0,Mathf.Abs(inputVec.x)); // mejorar luego?
+		}
 
-		if (!isWallCollided)
-		{
+
+		//if (!isWallCollided)
+		//{
 			//transform.position += new Vector3(inputVec.x * moveSpeed,0,0) *Time.deltaTime;
 			characterController.Move(vector);
-		}		
+		//}		
 		
         anim.SetFloat("Speed", speed);
 		
@@ -254,6 +258,26 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 		{
 			anim.SetBool("Air", true);
 			anim.SetBool("IdleWalk", false);
+			if(isWallCollided)
+			{
+				//ySpeed = 0.1f;
+				anim.SetBool("Air", true);
+				anim.SetBool("Wall", true);
+				moveVector.x = -(transform.forward.x) * inputVec.x * 1.0f;
+				if(inputVec.y > 0) 
+				{
+					moveVector.x = -(transform.forward.x) * inputVec.x * 10.0f;
+					ySpeed = jumpSpeed;
+					anim.SetTrigger("Jump");
+					anim.SetBool("Air", true);
+					anim.SetBool("IdleWalk", false);
+				}
+				else 
+					ySpeed = 0;
+			} 
+
+			else
+				anim.SetBool("Wall", false);
 		}
 		
 
@@ -262,19 +286,15 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 		RotatePlayer();
 		Disparar();		
 
-
-
-		Vector3 posSuelo = Vector3.zero;
-
-
-		
-
+	
+	
 	}
 	
 	void FixedUpdate ()
 	{
 
 		GroundedCheck();
+		WallCheck();
 
 		
 
@@ -333,23 +353,61 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 
 	private bool isGrounded = true;
 	
-
+	
     public void GroundedCheck()
     {
     	isGrounded = Physics.Raycast(
-		    transform.position /*+ new Vector3(0,0.02f,0)*/,
+		    transform.position, 
 		    jumpDirection,
 		    groundTolerance
 	    );
     	//print("isGrounded: " + isGrounded);
-    	//Debug.DrawRay(transform.position , jumpDirection * groundTolerance, Color.yellow); 
+    	Debug.DrawRay(transform.position , jumpDirection * groundTolerance, Color.yellow); 
 
     }
 
-
-
-    private void OnCollisionEnter(Collision other)
+    public void WallCheck()
     {
+    	Vector3 centro = transform.position + new Vector3(0,0.5f,0);
+    	float distancia = 0.5f;
+    	isWallCollided = Physics.Raycast(
+		    centro, 
+		    transform.forward,
+		    distancia
+	    );
+    	Debug.Log("hay pared?: " + isWallCollided);
+    	Debug.DrawRay(centro , transform.forward * distancia, Color.yellow); 
+    }
+
+/*
+    void OnControllerColliderHit (ControllerColliderHit  hit)
+    {
+    	Debug.Log("nyoron");
+
+    	Rigidbody body = hit.collider.attachedRigidbody;
+
+    	if (body == null || body.isKinematic)
+        {
+            return;
+        }
+
+    	if (hit.gameObject.CompareTag("Wall"))
+	    {
+		    isWallCollided = true;
+		    //_objectCollided = ObjectCollided.Wall;
+		    // jumpDirection = Vector3.right;
+		    print("owo");
+		    return;
+	    }
+	   
+	    
+	    return;
+    }*/
+
+/*
+    void OnCollisionEnter(Collision other)
+    {
+    	
 	    if (other.gameObject.CompareTag("Ground"))
 	    {
 		    // _objectCollided = ObjectCollided.Ground;
@@ -373,9 +431,12 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
             print("None wallground");
         }
     }
+    */
 
-    private void OnCollisionExit(Collision other)
+/*
+    void OnCollisionExit(Collision other)
     {
+    	
 	    if (other.gameObject.CompareTag("Ground"))
 	    {
 		    // _objectCollided = ObjectCollided.Ground;
@@ -383,13 +444,14 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 		    // jumpDirection = Vector3.down;
 		    print("coll Ground");
 	    }
-	    else if (other.gameObject.CompareTag("Wall"))
+	    else
+	    if (other.gameObject.CompareTag("Wall"))
 	    {
 		    isWallCollided = false;
 		    // _objectCollided = ObjectCollided.Wall;
 		    // jumpDirection = Vector3.right;
-		    print("coll Wall");
+		    print("coll Wall exit");
 	    }
-    }
+    }*/
 }
 
