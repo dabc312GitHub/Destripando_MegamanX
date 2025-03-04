@@ -9,8 +9,7 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 	[Header("Input")]
     public KeyCode jumpKeyboard = KeyCode.Space;
     public KeyCode fireShooting = KeyCode.X;
-    public float jumpFactor;
- 	private float ySpeed;
+    public float jumpSpeed; 
     public float groundTolerance = 0.2f;
 
 	public float factorGravity = 1f;
@@ -66,12 +65,9 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 	Vector3 PositionPlayer = Vector3.zero;
 	
 	
-
-	private bool isJumping = false;	
-	private bool isJumpingUp = false;
 	
 	float jumpAxisY = 0.0f;
-	public float limitJumping = 5.0f;
+	public float jumpHeight = 1.5f;
 
 	GameObject bullet = null;
 	private float _counterFireShooting = 0.0f;
@@ -81,6 +77,10 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 	private Color chargerColor_1 = new Color(0, 191, 74, 255) / 255f *3f;
 	private Color chargerColor_2 = Color.red * 2f;	
 	private Material colorCargaMat;
+
+	private CharacterController characterController;
+
+	private float ySpeed;
 
 	void Start ()
 	{
@@ -99,7 +99,14 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 
 	    inputVec = new Vector3(0,0,0);
 
+	    characterController = GetComponent<CharacterController>();
+
 	    
+	}
+
+	public bool getOrientation()
+	{
+		return headingLeft;
 	}
 
 	void RotatePlayer()
@@ -123,7 +130,7 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 		
 	}
 
-	void MovePlayer()
+	void MovePlayer(Vector3 vector)
 	{
 		float speed = Mathf.Abs(inputVec.x);
 		speed = Mathf.SmoothDamp(anim.GetFloat("Speed"), speed, ref velocity, 0.1f);
@@ -131,21 +138,18 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 			speed = 0;
 
 		if (!isWallCollided)
-			transform.position += new Vector3(inputVec.x * moveSpeed,0,0) *Time.deltaTime;
+		{
+			//transform.position += new Vector3(inputVec.x * moveSpeed,0,0) *Time.deltaTime;
+			characterController.Move(vector);
+		}		
 		
         anim.SetFloat("Speed", speed);
 		
 	}
 
-	void Update()
-	{		
-		inputVec.x = Input.GetAxis("Horizontal");
-		inputVec.y = Input.GetAxis("Vertical");
 
-		MovePlayer();
-		RotatePlayer();
-		
-
+	void Disparar()
+	{
 		float signo = Mathf.Sign(transform.forward.x); 
 		
 
@@ -160,7 +164,7 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 				bullet = Instantiate(bulletBase, firePoint.position, Quaternion.Euler(0, 90 * signo , 0));  
 				bullet.gameObject.SetActive(true);
 				bullet.transform.position = firePoint.position;
-				bullet.GetComponent<Rigidbody>().linearVelocity = Vector3.right * (firePoint.right.z * bulletSpeed_1);
+				bullet.GetComponent<Rigidbody>().linearVelocity = bullet.transform.forward *  bulletSpeed_1; //Vector3.right * (firePoint.right.z * bulletSpeed_1);
 
 			}
 
@@ -170,7 +174,7 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 				particulasCarga.SetActive(true);
 			}
 
-			if(_counterFireShooting > 4)
+			if(_counterFireShooting > 2.9f)
 			{				
 				colorCargaMat.SetColor("_Color", chargerColor_2);
 			}
@@ -182,26 +186,26 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 
 		if( Input.GetKeyUp(fireShooting))
 		{
-			Debug.Log(_counterFireShooting);
+			//Debug.Log(_counterFireShooting);
 		
-			if (_counterFireShooting >= 2f && _counterFireShooting < 4)
+			if (_counterFireShooting >= 2f && _counterFireShooting < 3)
 			{				
 
 				bullet = Instantiate(bullet2, firePoint.position, Quaternion.Euler(0, 90 *signo, 0));
 				bullet.gameObject.SetActive(true);
 				bullet.transform.position = firePoint.position;
 				
-				bullet.GetComponent<Rigidbody>().linearVelocity = Vector3.right * (firePoint.right.z * bulletSpeed_2);
+				bullet.GetComponent<Rigidbody>().linearVelocity = bullet.transform.forward  * bulletSpeed_2;
 				particulasCarga.SetActive(false);
 			}		
-			else if ( _counterFireShooting >= 4 )
+			else if ( _counterFireShooting >= 3 )
 			{
 						
 				bullet = Instantiate(bullet3, firePoint.position, Quaternion.Euler(0, 90 * signo, 0));
 				bullet.gameObject.SetActive(true);
 				bullet.transform.position = firePoint.position;
 				
-				bullet.GetComponent<Rigidbody>().linearVelocity = Vector3.right * (firePoint.right.z * bulletSpeed_3); //buscar forma sin rigidbody para balas porsiaca
+				bullet.GetComponent<Rigidbody>().linearVelocity = bullet.transform.forward *  bulletSpeed_3; //buscar forma sin rigidbody para balas porsiaca
 				particulasCarga.SetActive(false);				
 			}
 
@@ -211,40 +215,56 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 			particulasCarga.SetActive(false);
 		}
 
+	}
 
 
-		//************************* MOVIMIENTO //////////////////////////// 
+	
+	void Update()
+	{		
+		inputVec.x = Input.GetAxis("Horizontal");
+		inputVec.y = Input.GetAxis("Vertical");
 
-		Vector3 posSuelo = Vector3.zero;
-		//bool saltando = false;
+		Vector3 moveVector = new Vector3 ( inputVec.x * moveSpeed,jumpHeight*inputVec.y* moveSpeed ,0) ;		
+		
+		
+		ySpeed += Physics.gravity.y * Time.deltaTime;
+
+		
+
 		if(isGrounded)
 		{
-			posSuelo = transform.localPosition;
 			anim.SetBool("Air", false);
-		}
-		else // caso suelo se caiga? o camines al borde y caigas
-		{			
-			anim.SetBool("Air", true);
-		}
-
-		if( inputVec.y > 0) // puedo saltar mientras caigo, si pongo isGrounded ya no pero el salto lo hace a medias >:( ?? o no?
-		{
-			anim.SetTrigger("Jump");
-			anim.SetBool("Air", true);
-			anim.SetBool("IdleWalk", false);				
-			if(transform.localPosition.y <  (posSuelo  + new Vector3(0,1.5f,0)).y  )	//convertir altura en variable luego, funciona bien pero en cima vibra un poco	
-				transform.localPosition = Vector3.SmoothDamp(transform.localPosition, transform.localPosition + new Vector3(0,1.5f,0) , ref velocityV, jumpFactor* Time.deltaTime );
+			anim.SetBool("IdleWalk", true);
+			ySpeed = 0;
+			if(inputVec.y > 0) 
+			{
+				ySpeed = jumpSpeed;
+				anim.SetTrigger("Jump");
+				anim.SetBool("Air", true);
+				anim.SetBool("IdleWalk", false);
+			}
+			else 
+			{
+				ySpeed = 0;
+				//anim.SetBool("IdleWalk", true);
+				//anim.SetBool("Air", false);
+			}
 		}
 		else
 		{
-			anim.SetBool("IdleWalk", true);
-
-			/*
-			speed = Mathf.Abs(inputPlayer.x);
-			speed = Mathf.SmoothDamp(anim.GetFloat("Speed"), speed, ref velocity, 0.1f);
-				
-        	anim.SetFloat("Speed", speed);	*/
+			anim.SetBool("Air", true);
+			anim.SetBool("IdleWalk", false);
 		}
+		
+
+		moveVector.y = ySpeed * jumpHeight;
+		MovePlayer(moveVector* Time.deltaTime);		
+		RotatePlayer();
+		Disparar();		
+
+
+
+		Vector3 posSuelo = Vector3.zero;
 
 
 		
@@ -311,95 +331,21 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 
 	}
 
-	private bool isGrounded = false;
-
-    public void GroundedCheck()
-    {
-    	 isGrounded = Physics.Raycast(
-		    transform.position + new Vector3(0,0.05f,0),
-		    jumpDirection,
-		    groundTolerance
-	    );
-    	  print("isGrounded: " + isGrounded);
-
-
-    	 // isJumpingUp= !isGrounded;
-
-
-    }
-
-/*
-    public void GroundedCheck()
-    {
-	    bool wasGrounded = isGrounded;
-	    isGrounded = Physics.Raycast(
-		    transform.position + new Vector3(0,0.05f,0),
-		    jumpDirection,
-		    groundTolerance
-	    );
-
-	    //Debug.DrawRay(transform.position +new Vector3(0,0.05f,0), jumpDirection * groundTolerance, Color.yellow); 
-
-	    print("isGrounded: " + isGrounded);
-	    if (isGrounded)
-	    {
-		    if (!wasGrounded)
-		    {
-			    isJumpingUp = false;
-		    }
-		    else
-		    {
-			    anim.SetBool("Air", false);
-			    anim.SetBool("IdleWalk", true);    
-		    }
-	    }
-    }
-*/
-
+	private bool isGrounded = true;
 	
 
+    public void GroundedCheck()
+    {
+    	isGrounded = Physics.Raycast(
+		    transform.position /*+ new Vector3(0,0.02f,0)*/,
+		    jumpDirection,
+		    groundTolerance
+	    );
+    	//print("isGrounded: " + isGrounded);
+    	//Debug.DrawRay(transform.position , jumpDirection * groundTolerance, Color.yellow); 
 
-
-/*
-	private void RotatePlayer(Vector2 inputPlayer)
-	{
-		// Check if direction changes
-		if ((inputPlayer.x < 0f && !headingLeft) || (inputPlayer.x > 0f && headingLeft))
-		{
-			previousTargetRot = targetRot;
-			//print("Previous Rotation: " + previousTargetRot);
-			if (inputPlayer.x < 0f)
-			{
-				targetRot = Quaternion.Euler(0, 270, 0);
-			}
-
-			if (inputPlayer.x > 0f)
-			{
-				targetRot = Quaternion.Euler(0, 90, 0);
-			}
-			headingLeft = !headingLeft;
-		}
-		// Rotate player if direction changes
-		transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime * 20f);
-		//print("Rotation: " + transform.rotation);
-	}
-
-	private void MovePlayer(Vector2 inputPlayer)
-	{
-		speed = Mathf.Abs(inputPlayer.x);
-		speed = Mathf.SmoothDamp(anim.GetFloat("Speed"), speed, ref velocity, 0.1f);
-		if (_objectCollided == ObjectCollided.Wall)
-			speed = 0;
-
-		if (!isWallCollided)
-		{
-			//rigbody.linearVelocity = new Vector3(inputPlayer.x * factorMovement, rigbody.linearVelocity.y, 0); 
-			//rigbody.AddForce(transform.forward * factorMovement);
-			transform.position += new Vector3(inputPlayer.x * factorMovement,0,0) *Time.deltaTime;
-		}
-        anim.SetFloat("Speed", speed);
     }
-	   */
+
 
 
     private void OnCollisionEnter(Collision other)
