@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 public class Impacto : MonoBehaviour
 {
@@ -9,6 +11,7 @@ public class Impacto : MonoBehaviour
     [SerializeField] private Material megamanMatA;
     [SerializeField] private Material megamanMatB;
     [SerializeField] private float segInvencible = 2.0f;
+    [SerializeField] private Material FullScreenMat;
     private Material controlImpacto;
     private Animator animator;
     private Collider extension;
@@ -16,6 +19,7 @@ public class Impacto : MonoBehaviour
 
     void Start()
     {
+        FullScreenMat.SetFloat("_EfectoBlanco",0);
         if(quadImpacto)
             controlImpacto = quadImpacto.GetComponent<Renderer>().sharedMaterial;
         Reset();
@@ -47,13 +51,13 @@ public class Impacto : MonoBehaviour
     {
         return megamanMatB;
     }
-/*
-    void Update()
-    {
-        if (!animator.GetBool("Damage"))
-            Reset();
-    }*/
 
+     public bool getVivo()
+     {
+        return vida<=0;
+     }
+
+   
     void Impactar()  // quedaria mejor con corutina?, cambio menos brusco pero afectaria sincronizacion con las transiciones de anims?
     {
         if(mat)
@@ -88,12 +92,15 @@ public class Impacto : MonoBehaviour
 
     void Muerte()
     {
+        vida =0;
         vidaUI.SetFloat("_Salud", 0.0f);
         muerte.gameObject.SetActive(true);
         transform.GetChild(0).gameObject.SetActive(false);
         transform.GetChild(4).gameObject.SetActive(false); // collider ancho...
         
         // UI game Over, en realidad pantalla se pone en blanco gradualmente y si fueron 3 veces sale ventana de password
+        StartCoroutine("Pantalla");
+        
     }
 
     void Reset()
@@ -104,6 +111,30 @@ public class Impacto : MonoBehaviour
            controlImpacto.SetFloat("_Impacto",0.0f);
            megamanMatB.SetFloat("_Carga",0.0f);            
         }
+    }
+
+    public IEnumerator Pantalla()
+    {
+        float tiempo = 0;
+        while(tiempo <= 3 )
+        {
+            tiempo += Time.deltaTime;
+            FullScreenMat.SetFloat("_EfectoBlanco",tiempo/3);
+             yield return null;
+        }
+        yield return null;
+        
+    }
+
+
+
+    void OnTriggerEnter(Collider other) // a veces no entra por el character controller que es raro?
+    {
+        if(other.gameObject.CompareTag("ZonaMuerte"))
+        {
+            Muerte();
+        }
+               
     }
    
 }

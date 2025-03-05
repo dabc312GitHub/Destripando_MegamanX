@@ -12842,6 +12842,7 @@ Transform:
   - {fileID: 1064457572}
   - {fileID: 751265713}
   - {fileID: 535178059}
+  - {fileID: 891446259}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &526614165
@@ -23366,6 +23367,59 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 126
   m_CollisionDetection: 0
+--- !u!1 &891446258
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 891446259}
+  - component: {fileID: 891446260}
+  m_Layer: 0
+  m_Name: ZonaCaida
+  m_TagString: ZonaMuerte
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &891446259
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 891446258}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 18.84, y: -2, z: -3.04}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 520840423}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &891446260
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 891446258}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 3.96105, y: 1.6522906, z: 6.746943}
+  m_Center: {x: 1.480525, y: -0.3261453, z: 1.1708691}
 --- !u!1 &896532873
 GameObject:
   m_ObjectHideFlags: 0
@@ -34485,6 +34539,7 @@ MonoBehaviour:
   megamanMatA: {fileID: 2100000, guid: 70d790a369aed3a44b755fba1a24120d, type: 2}
   megamanMatB: {fileID: 2100000, guid: 9f16d94d57d253e4aa499b6af210cd6c, type: 2}
   segInvencible: 3
+  FullScreenMat: {fileID: 2100000, guid: 97b69a109c1dc7645af3dfc1b2c5888a, type: 2}
 --- !u!114 &1622156088
 MonoBehaviour:
   m_ObjectHideFlags: 0

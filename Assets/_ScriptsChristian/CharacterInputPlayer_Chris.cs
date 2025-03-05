@@ -81,6 +81,7 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 	private CharacterController characterController;
 
 	private float ySpeed;
+	private Impacto impactoScript;
 
 	void Start ()
 	{
@@ -100,6 +101,7 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 	    inputVec = new Vector3(0,0,0);
 
 	    characterController = GetComponent<CharacterController>();
+	    impactoScript = GetComponent<Impacto>();
 
 	    
 	}
@@ -132,22 +134,25 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 
 	void MovePlayer(Vector3 vector)
 	{
-		float speed = Mathf.Abs(inputVec.x);
-		speed = Mathf.SmoothDamp(anim.GetFloat("Speed"), speed, ref velocity, 0.1f);
-		if (isWallCollided)// (_objectCollided == ObjectCollided.Wall) //Funciona?
-		{			
-			//speed = Mathf.SmoothDamp(anim.GetFloat("Speed"),0, ref velocity, 0.1f);
-			speed = Mathf.Lerp(anim.GetFloat("Speed"),0,Mathf.Abs(inputVec.x)); // mejorar luego?
+		if(!impactoScript.getVivo()) 
+		{
+			float speed = Mathf.Abs(inputVec.x);
+			speed = Mathf.SmoothDamp(anim.GetFloat("Speed"), speed, ref velocity, 0.1f);
+			if (isWallCollided)// (_objectCollided == ObjectCollided.Wall) //Funciona?
+			{			
+				//speed = Mathf.SmoothDamp(anim.GetFloat("Speed"),0, ref velocity, 0.1f);
+				speed = Mathf.Lerp(anim.GetFloat("Speed"),0,Mathf.Abs(inputVec.x)); // mejorar luego?
+			}
+
+			//if (!isWallCollided)
+			//{
+				//transform.position += new Vector3(inputVec.x * moveSpeed,0,0) *Time.deltaTime;
+				characterController.Move(vector);
+			//}		
+			
+	        anim.SetFloat("Speed", speed);
 		}
-
-
-		//if (!isWallCollided)
-		//{
-			//transform.position += new Vector3(inputVec.x * moveSpeed,0,0) *Time.deltaTime;
-			characterController.Move(vector);
-		//}		
-		
-        anim.SetFloat("Speed", speed);
+			
 		
 	}
 

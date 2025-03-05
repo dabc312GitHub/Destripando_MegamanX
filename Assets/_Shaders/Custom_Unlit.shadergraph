@@ -35,6 +35,9 @@
         },
         {
             "m_Id": "63de8f43f2774c798909e1ad18794bf4"
+        },
+        {
+            "m_Id": "91d474435b684729a76865e49538201f"
         }
     ],
     "m_Keywords": [],
@@ -170,6 +173,9 @@
         },
         {
             "m_Id": "a14ee1d408e04996953fdabd9d340072"
+        },
+        {
+            "m_Id": "3bf0ad6bbdf4499db088f362e02dc70b"
         }
     ],
     "m_GroupDatas": [],
@@ -325,6 +331,20 @@
             "m_InputSlot": {
                 "m_Node": {
                     "m_Id": "284293f5a2ca4199bdbfcfba54f46036"
+                },
+                "m_SlotId": 0
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
+                    "m_Id": "3bf0ad6bbdf4499db088f362e02dc70b"
+                },
+                "m_SlotId": 0
+            },
+            "m_InputSlot": {
+                "m_Node": {
+                    "m_Id": "c218523e75f24349bb82b22546dbb4d9"
                 },
                 "m_SlotId": 0
             }
@@ -1852,6 +1872,42 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.PropertyNode",
+    "m_ObjectId": "3bf0ad6bbdf4499db088f362e02dc70b",
+    "m_Group": {
+        "m_Id": ""
+    },
+    "m_Name": "Property",
+    "m_DrawState": {
+        "m_Expanded": true,
+        "m_Position": {
+            "serializedVersion": "2",
+            "x": -655.4646606445313,
+            "y": 1615.7144775390625,
+            "width": 0.0,
+            "height": 0.0
+        }
+    },
+    "m_Slots": [
+        {
+            "m_Id": "847be694ca244db3ac0eb49364bd02f8"
+        }
+    ],
+    "synonyms": [],
+    "m_Precision": 0,
+    "m_PreviewExpanded": true,
+    "m_DismissedVersion": 0,
+    "m_PreviewMode": 0,
+    "m_CustomColors": {
+        "m_SerializableColors": []
+    },
+    "m_Property": {
+        "m_Id": "91d474435b684729a76865e49538201f"
+    }
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.DynamicVectorMaterialSlot",
     "m_ObjectId": "3f0da4d64ded4987914bcb282bb4afc7",
     "m_Id": 0,
@@ -2866,6 +2922,21 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId": "847be694ca244db3ac0eb49364bd02f8",
+    "m_Id": 0,
+    "m_DisplayName": "VelParpadeoInvul",
+    "m_SlotType": 1,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Out",
+    "m_StageCapability": 3,
+    "m_Value": 0.0,
+    "m_DefaultValue": 0.0,
+    "m_Labels": []
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.Vector4MaterialSlot",
     "m_ObjectId": "8548d8fa609941e5ac7431ffbe2a66d1",
     "m_Id": 0,
@@ -3068,6 +3139,34 @@
     "m_Value": 0.0,
     "m_DefaultValue": 0.0,
     "m_Labels": []
+}
+
+{
+    "m_SGVersion": 1,
+    "m_Type": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty",
+    "m_ObjectId": "91d474435b684729a76865e49538201f",
+    "m_Guid": {
+        "m_GuidSerialized": "f054eda0-7a86-48f7-b4fe-21807786f193"
+    },
+    "m_Name": "VelParpadeoInvul",
+    "m_DefaultRefNameVersion": 1,
+    "m_RefNameGeneratedByDisplayName": "VelParpadeoInvul",
+    "m_DefaultReferenceName": "_VelParpadeoInvul",
+    "m_OverrideReferenceName": "",
+    "m_GeneratePropertyBlock": true,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
+    "m_DismissedVersion": 0,
+    "m_Precision": 0,
+    "overrideHLSLDeclaration": false,
+    "hlslDeclarationOverride": 0,
+    "m_Hidden": false,
+    "m_Value": 6.0,
+    "m_FloatType": 0,
+    "m_RangeValues": {
+        "x": 0.0,
+        "y": 1.0
+    }
 }
 
 {
@@ -4691,6 +4790,9 @@
         },
         {
             "m_Id": "63de8f43f2774c798909e1ad18794bf4"
+        },
+        {
+            "m_Id": "91d474435b684729a76865e49538201f"
         }
     ]
 }
