@@ -40,6 +40,7 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
     
     
     private Vector3 jumpDirection = Vector3.down;
+    private bool deslizar = false;
    
 
     private Vector3 velocityV = Vector3.zero;
@@ -77,7 +78,8 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 
 	private float ySpeed;
 	private Impacto impactoScript;
-	private ChainIKConstraint Rig;
+	private ChainIKConstraint IK_R;
+	private ChainIKConstraint IK_L;
 
 	void Start ()
 	{
@@ -98,7 +100,11 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 	    characterController = GetComponent<CharacterController>();
 	    impactoScript = GetComponent<Impacto>();
 
-	    Rig = transform.GetChild(5).GetChild(0).GetComponent<ChainIKConstraint>(); // cuidado con la posicion, no creo que sea buena practica pero ¯\_(ツ)_/¯ 
+	    IK_R = transform.GetChild(5).GetChild(0).GetComponent<ChainIKConstraint>(); // cuidado con la posicion, no creo que sea buena practica pero ¯\_(ツ)_/¯ 
+	    IK_L = transform.GetChild(5).GetChild(1).GetComponent<ChainIKConstraint>();
+
+	    IK_R.weight =0; 
+		IK_L.weight =0;
 
 	    
 	}
@@ -164,11 +170,25 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 	{
 		float signo = Mathf.Sign(transform.forward.x); 
 		
+		if (isWallCollided && anim.GetBool("Air"))
+			signo = -signo;
 
 		if (Input.GetKey(fireShooting))  //ideal seria un valor continuo para que sea suave
 		{
 			anim.SetLayerWeight(1, 1.0f);
-			Rig.weight =1; 
+			if(signo >0)
+			{
+				IK_R.weight =1;
+				IK_L.weight =0; 
+			}
+			else
+			{
+				IK_R.weight =0;
+				IK_L.weight =1;
+			}
+			
+			
+
 			_counterFireShooting += Time.deltaTime;
 
 
@@ -197,7 +217,8 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 		else
 		{
 			anim.SetLayerWeight(1, 0.0f);
-			Rig.weight =0; 
+			IK_R.weight =0; 
+			IK_L.weight =0;
 		}
 
 		if( Input.GetKeyUp(fireShooting))
@@ -245,7 +266,7 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 		
 		ySpeed += Physics.gravity.y * Time.deltaTime;
 
-		bool deslizar = false;
+		deslizar = false;
 		anim.SetBool("Left", false);
 		
 		if(deslizar && headingLeft) // creo que ni funciona
