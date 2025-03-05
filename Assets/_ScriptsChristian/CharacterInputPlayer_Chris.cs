@@ -110,22 +110,28 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 
 	void RotatePlayer()
 	{
-		if ((inputVec.x < 0f && !headingLeft) || (inputVec.x > 0f && headingLeft))
-		{
-						
-			if (inputVec.x < 0f)
-			{
-				targetRot = Quaternion.Euler(0, 270, 0);
-			}
-
-			if (inputVec.x > 0f)
-			{
-				targetRot = Quaternion.Euler(0, 90, 0);
-			}
-			headingLeft = !headingLeft;
-		}
 		
-		transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime * 20f);
+		if(!anim.GetBool("Wall") && !anim.GetBool("Air")) // no rotar si estoy deslizandome
+		{
+			if ((inputVec.x < 0f && !headingLeft) || (inputVec.x > 0f && headingLeft))
+			{
+							
+				if (inputVec.x < 0f)
+				{
+					targetRot = Quaternion.Euler(0, 270, 0);
+				}
+
+				if (inputVec.x > 0f)
+				{
+					targetRot = Quaternion.Euler(0, 90, 0);
+				}
+				headingLeft = !headingLeft;
+				headingLeft = transform.forward.x < 0; //confirmar caso se desliza
+			}
+			
+			transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, Time.deltaTime * 20f);
+		}		
+	
 		
 	}
 
@@ -240,6 +246,13 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 		ySpeed += Physics.gravity.y * Time.deltaTime;
 
 		bool deslizar = false;
+		anim.SetBool("Left", false);
+		
+		if(deslizar && headingLeft) // creo que ni funciona
+		{
+			anim.SetBool("Left", true);
+			//transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0, 270, 0), Time.deltaTime * 20f);//??
+		}
 
 		if(isGrounded)
 		{
@@ -259,6 +272,12 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 				//anim.SetBool("IdleWalk", true);
 				//anim.SetBool("Air", false);
 			}
+			if(!isWallCollided)
+			{
+				anim.SetBool("Wall", false);
+				anim.SetBool("Air", false);
+			}
+
 		}
 		else
 		{
