@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using Cinemachine.Examples;
 using UnityEngine.Serialization;
+using UnityEngine.Animations.Rigging;
 
 [AddComponentMenu("")] // Don't display in add component menu
 public class CharacterInputPlayer_Chris : MonoBehaviour
@@ -16,8 +17,7 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 	public float moveSpeed = 1f;
 
 
-	public GameObject particulasCarga;
-	
+	public GameObject particulasCarga;	
 		
 	public GameObject bulletBase; // Prefab de la bala base
 	public GameObject bullet2;    // Prefab de la bala 2
@@ -30,21 +30,19 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 	public float bulletSpeed_3 = 15f; 
 
 	
-
   
-    bool isSprinting = false;
-    Animator anim;
+    private Animator anim;
     private Vector3 inputVec;
-    float velocity;
-    bool headingLeft = false;
-    Quaternion targetRot;
-    Quaternion previousTargetRot;
-    Rigidbody rigbody;
+    private float velocity;
+    private bool headingLeft = false;
+    private Quaternion targetRot;
+    private Quaternion previousTargetRot;
     
-    Vector3 jumpDirection = Vector3.down;
-    bool GrounCollided = false;
+    
+    private Vector3 jumpDirection = Vector3.down;
+   
 
-    Vector3 velocityV = Vector3.zero;
+    private Vector3 velocityV = Vector3.zero;
 
     private enum ObjectCollided
 	{
@@ -54,22 +52,19 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 		None
 	}
 
-	private bool isGroundCollided = false;
 	private bool isWallCollided = false;
+	private bool isGrounded = true;
 
 	private ObjectCollided _objectCollided;
 
 	private Material VFX_brilloCarga;
 
 
-	Vector3 PositionPlayer = Vector3.zero;
+	private Vector3 PositionPlayer = Vector3.zero;
 	
-	
-	
-	float jumpAxisY = 0.0f;
 	public float jumpHeight = 1.5f;
 
-	GameObject bullet = null;
+	private GameObject bullet = null;
 	private float _counterFireShooting = 0.0f;
 
 
@@ -82,15 +77,15 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 
 	private float ySpeed;
 	private Impacto impactoScript;
+	private ChainIKConstraint Rig;
 
 	void Start ()
 	{
 		
-	    anim = GetComponent<Animator>();
-	    rigbody = GetComponent<Rigidbody>();
+	    anim = GetComponent<Animator>();	    
 	    targetRot = transform.rotation;        
 	    
-	    //anim.SetBool("Jumping", true);
+	   
 
 	    VFX_brilloCarga = transform.GetChild(0).GetComponent<Renderer>().sharedMaterial;
 
@@ -102,6 +97,8 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 
 	    characterController = GetComponent<CharacterController>();
 	    impactoScript = GetComponent<Impacto>();
+
+	    Rig = transform.GetChild(5).GetChild(0).GetComponent<ChainIKConstraint>(); // cuidado con la posicion, no creo que sea buena practica pero ¯\_(ツ)_/¯ 
 
 	    
 	}
@@ -165,6 +162,7 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 		if (Input.GetKey(fireShooting))  //ideal seria un valor continuo para que sea suave
 		{
 			anim.SetLayerWeight(1, 1.0f);
+			Rig.weight =1; 
 			_counterFireShooting += Time.deltaTime;
 
 
@@ -191,7 +189,10 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 				
 		}
 		else
+		{
 			anim.SetLayerWeight(1, 0.0f);
+			Rig.weight =0; 
+		}
 
 		if( Input.GetKeyUp(fireShooting))
 		{
@@ -381,7 +382,7 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 
 	}
 
-	private bool isGrounded = true;
+	
 	
 	
     public void GroundedCheck()

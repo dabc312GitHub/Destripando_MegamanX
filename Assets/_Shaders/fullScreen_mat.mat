@@ -38,7 +38,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _Efecto: 1
-    - _EfectoBlanco: 1.0027515
+    - _EfectoBlanco: 0
     - _EfectoRes: 1
     - _Res: 150
     m_Colors: []
