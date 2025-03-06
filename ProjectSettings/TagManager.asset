@@ -8,6 +8,11 @@ TagManager:
   - CinemachineTarget
   - Wall
   - ZonaMuerte
+  - En_Spiky
+  - MegamanAtaqueA
+  - MegamanAtaqueB
+  - MegamanAtaqueC
+  - Proyectil
   layers:
   - Default
   - TransparentFX

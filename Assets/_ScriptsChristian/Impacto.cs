@@ -15,7 +15,8 @@ public class Impacto : MonoBehaviour
     private Material controlImpacto;
     private Animator animator;
     private Collider extension;
-    private float vida = 10f;
+    private float vida = 20f;
+    private float vidaMaxima;
 
     void Start()
     {
@@ -29,6 +30,7 @@ public class Impacto : MonoBehaviour
 
         megamanMatA.SetFloat("_Invulnerable",0.0f); // y aqui creo qe no se malogra?
         megamanMatB.SetFloat("_Invulnerable",0.0f);
+        vidaMaxima = vida;
 
     }
 
@@ -70,7 +72,7 @@ public class Impacto : MonoBehaviour
 
          //temporal
             vida -= 3; 
-            vidaUI.SetFloat("_Salud", vida/10f);
+            vidaUI.SetFloat("_Salud", vida/vidaMaxima);
         if( vida <= 0)
             Muerte(); 
         // temporal
@@ -80,12 +82,14 @@ public class Impacto : MonoBehaviour
 
     void Damage (float d)
     {
+        Debug.Log(vida);
 
         vida -= d; 
         if( vida <= 0)
             Muerte();                  
         else
-            vidaUI.SetFloat("_Salud", vida/10f);
+            vidaUI.SetFloat("_Salud", vida/vidaMaxima);
+         Debug.Log(vida);
 
     }
 
@@ -130,9 +134,16 @@ public class Impacto : MonoBehaviour
 
     void OnTriggerEnter(Collider other) // a veces no entra por el character controller que es raro?
     {
+        
         if(other.gameObject.CompareTag("ZonaMuerte"))
         {
             Muerte();
+        }
+
+        if(other.gameObject.CompareTag("En_Spiky"))
+        {
+            float damage = other.transform.GetComponent<Enemigo>().getAtaqueCol();
+            Damage(damage); // daño en megaman debe interrumpir su movimiento brevemente
         }
                
     }

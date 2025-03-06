@@ -24,11 +24,13 @@ public class Explotar : MonoBehaviour
 
    void OnTriggerEnter(Collider Col) 
    {
-       if(Col.tag == "Player")
+     
+       if(Col.tag == "Player") // si proyectil toca player
         {
             if(!invulnerable)
             {
-                Explota();
+                if( gameObject.CompareTag("Proyectil"))
+                    Explota();// solo explota si es proyectil
                 Col.transform.parent.GetComponent<Animator>().SetTrigger("Damage");
                 invulnerable = true;
                 ImpactoScript.getExtension().enabled = false;   
@@ -36,13 +38,11 @@ public class Explotar : MonoBehaviour
                 matB.SetFloat("_Invulnerable",1.0f);
                 StartCoroutine("Invulnerable");
                 //Col.transform.parent.GetComponent<Animator>().SetBool("Damage", false); 
-            }
-            
+            }        
             
         }
-
-        else
-            Explota();
+        else // si choco pared
+            Explota(); 
                 
    }
 
