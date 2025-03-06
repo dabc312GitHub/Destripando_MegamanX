@@ -82,14 +82,12 @@ public class Impacto : MonoBehaviour
 
     void Damage (float d)
     {
-        Debug.Log(vida);
-
         vida -= d; 
         if( vida <= 0)
             Muerte();                  
         else
             vidaUI.SetFloat("_Salud", vida/vidaMaxima);
-         Debug.Log(vida);
+       
 
     }
 

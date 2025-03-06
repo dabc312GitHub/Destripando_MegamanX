@@ -80,19 +80,37 @@ public class Enemigo : MonoBehaviour
         
         if(tipoEnemigo == TipoEnemigo.spiky)
         {
-            if( puntosDeVida == 0)
+            if(isWallCollided) // el parche...
             {
-                //vectorMov = Vector3.SmoothDamp(vectorMov, Vector3.zero, ref velocity, 0.3f);
-                vectorMov.x = Mathf.SmoothDamp( vectorMov.x, 0, ref velocity.x , 0.8f);
-                //vectorMov.x = Mathf.Lerp( vectorMov.x, 0, 0.1f);
-               
+                vectorMov.x = Mathf.SmoothDamp( vectorMov.x, 0, ref velocity.x , 0.1f);
+                Debug.Log(vectorMov.x);
             }
             else
-                vectorMov.x = -1 *velocidadMov;
+            {
+                if( puntosDeVida == 0)
+                {
+                    //vectorMov = Vector3.SmoothDamp(vectorMov, Vector3.zero, ref velocity, 0.3f);
+                    vectorMov.x = Mathf.SmoothDamp( vectorMov.x, 0, ref velocity.x , 0.8f);
+                    //vectorMov.x = Mathf.Lerp( vectorMov.x, 0, 0.1f);
+                   
+                }
+                else
+                    vectorMov.x = -1 *velocidadMov;
 
+                if(!isGrounded)    
+                    vectorMov.y += Physics.gravity.y * Time.deltaTime * 0.1f;
+            }
+           
             Movimiento(vectorMov); //Spiky tambien se mueve en una rampa a ver como la haces sin RigidBody :P
 
         }
+    }
+
+    void FixedUpdate()
+    {
+        GroundedCheck();
+        if(!isWallCollided) // solo una vez?
+            WallCheck();
     } 
 
     void Movimiento(Vector3 vectorMov) 
@@ -100,7 +118,40 @@ public class Enemigo : MonoBehaviour
         transform.position += vectorMov * Time.deltaTime;
     }
 
-   
+    private float groundTolerance =0.1f;
+    private bool isGrounded = false;
+    private bool isWallCollided = false;
+
+
+    void GroundedCheck()
+    {
+        isGrounded = Physics.Raycast(
+            transform.position, 
+            Vector3.down,
+            groundTolerance
+        );
+        //print("isGrounded: " + isGrounded);
+        Debug.DrawRay(transform.position , Vector3.down * groundTolerance, Color.yellow); 
+
+    }
+
+    public void WallCheck()
+    {
+        Vector3 centro = transform.position + new Vector3(0,0.5f,0);
+        RaycastHit hit;
+        float distancia = 0.5f;
+        isWallCollided = Physics.Raycast(
+            centro, 
+            new Vector3(-1,0,0),
+            out hit,
+            distancia
+        );
+
+        if ( isWallCollided && !hit.transform.gameObject.CompareTag("Wall") )
+            isWallCollided = false;
+
+        Debug.DrawRay(centro , new Vector3(-1,0,0) * distancia, Color.yellow); 
+    }
 
     public int getId()
     {
