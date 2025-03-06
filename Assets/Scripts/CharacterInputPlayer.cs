@@ -18,12 +18,6 @@ public class CharacterInputPlayer : MonoBehaviour
 	public Material shBrightMesh;
 
 	public GameObject goAuraCharger;
-	// public GameObject chargerParticles;
-	// public GameObject projectileBasic;
-	// public GameObject projectileMedium;
-	// public GameObject projectileHard;
-	// public Transform firePoint; // Punto de salida de las balas
-	// public float bulletSpeed = 10f; // Velocidad de la bala
 	
 	
 	public GameObject bulletBase; // Prefab de la bala base
@@ -294,25 +288,15 @@ public class CharacterInputPlayer : MonoBehaviour
     {
 	    if (other.gameObject.CompareTag("Ground"))
 	    {
-		    // _objectCollided = ObjectCollided.Ground;
 		    isGroundCollided = true;
-			// anim.SetBool("Air", false);
-			// anim.SetTrigger("Ground");
-			// anim.SetBool("Jumping", false);
-            // jumpDirection = Vector3.down;
-            print("coll Ground");
 	    }
 	    else if (other.gameObject.CompareTag("Wall"))
 	    {
 		    isWallCollided = true;
-		    // _objectCollided = ObjectCollided.Wall;
-		    // jumpDirection = Vector3.right;
-		    print("coll Wall");
 	    }
 		else
 		{
             _objectCollided = ObjectCollided.None;
-            print("None wallground");
         }
     }
 
@@ -320,17 +304,11 @@ public class CharacterInputPlayer : MonoBehaviour
     {
 	    if (other.gameObject.CompareTag("Ground"))
 	    {
-		    // _objectCollided = ObjectCollided.Ground;
 		    isGroundCollided = false;
-		    // jumpDirection = Vector3.down;
-		    print("coll Ground");
 	    }
 	    else if (other.gameObject.CompareTag("Wall"))
 	    {
 		    isWallCollided = false;
-		    // _objectCollided = ObjectCollided.Wall;
-		    // jumpDirection = Vector3.right;
-		    print("coll Wall");
 	    }
     }
 }
