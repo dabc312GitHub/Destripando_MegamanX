@@ -15,6 +15,9 @@ public class Enemigo : MonoBehaviour
     private bool efectoDamage = false;
     private Vector3 velocity = Vector3.zero;
     private Vector3 vectorMov = Vector3.zero;
+    private Collider col;
+    private Explotar explotaScript;
+    private bool bienMuerto = false;
 
     private enum TipoEnemigo
     {
@@ -63,6 +66,8 @@ public class Enemigo : MonoBehaviour
         }
         animator = GetComponent<Animator>();
         mat = transform.GetChild(0).GetComponent<Renderer>().material;
+        col = GetComponent<Collider>();
+        explotaScript = GetComponent<Explotar>();
     }
 
     void Update()
@@ -77,13 +82,21 @@ public class Enemigo : MonoBehaviour
             }
         }
 
+        Debug.Log(vectorMov.x);
         
         if(tipoEnemigo == TipoEnemigo.spiky)
         {
+            if( !bienMuerto && puntosDeVida==0 && vectorMov.x > -0.05f ) //recien quieto, puntos de vida 0 porque al inicio vectorx es zero
+            {
+                //recien explotar solo Spiky fuera de evento de anim porque se mueve un poquito muertito
+                explotaScript.Explota();
+                bienMuerto = true;
+            }
+
             if(isWallCollided) // el parche...
             {
                 vectorMov.x = Mathf.SmoothDamp( vectorMov.x, 0, ref velocity.x , 0.1f);
-                Debug.Log(vectorMov.x);
+                //Debug.Log(vectorMov.x);
             }
             else
             {
@@ -91,7 +104,7 @@ public class Enemigo : MonoBehaviour
                 {
                     //vectorMov = Vector3.SmoothDamp(vectorMov, Vector3.zero, ref velocity, 0.3f);
                     vectorMov.x = Mathf.SmoothDamp( vectorMov.x, 0, ref velocity.x , 0.8f);
-                    //vectorMov.x = Mathf.Lerp( vectorMov.x, 0, 0.1f);
+                    //vectorMov.x = Mathf.Lerp( vectorMov.x, 0, 0.1f);                    
                    
                 }
                 else
@@ -100,8 +113,9 @@ public class Enemigo : MonoBehaviour
                 if(!isGrounded)    
                     vectorMov.y += Physics.gravity.y * Time.deltaTime * 0.1f;
             }
-           
-            Movimiento(vectorMov); //Spiky tambien se mueve en una rampa a ver como la haces sin RigidBody :P
+         
+         if(!bienMuerto)  
+            Movimiento(vectorMov); //Spiky tambien se mueve en una rampa a ver como la hago sin RigidBody :P, bueno lo logré maso :P
 
         }
     }
@@ -131,7 +145,7 @@ public class Enemigo : MonoBehaviour
             groundTolerance
         );
         //print("isGrounded: " + isGrounded);
-        Debug.DrawRay(transform.position , Vector3.down * groundTolerance, Color.yellow); 
+       // Debug.DrawRay(transform.position , Vector3.down * groundTolerance, Color.yellow); 
 
     }
 
@@ -150,7 +164,7 @@ public class Enemigo : MonoBehaviour
         if ( isWallCollided && !hit.transform.gameObject.CompareTag("Wall") )
             isWallCollided = false;
 
-        Debug.DrawRay(centro , new Vector3(-1,0,0) * distancia, Color.yellow); 
+        //Debug.DrawRay(centro , new Vector3(-1,0,0) * distancia, Color.yellow); 
     }
 
     public int getId()
@@ -165,13 +179,18 @@ public class Enemigo : MonoBehaviour
 
     void Muerte()
     {
+        if(col)
+            col.enabled = false;
         puntosDeVida = 0;
+
         if( tipoEnemigo == TipoEnemigo.spiky)
         {
             animator.SetTrigger("Muerte");
             efectoDamage = false; //si muere deja de brillar?
-            mat.SetFloat("_Damage",0);
+            mat.SetFloat("_Damage",0);           
         }
+           
+        
     }
 
     void Damage(float d)
@@ -270,7 +289,7 @@ public class Enemigo : MonoBehaviour
 
         if(other.gameObject.CompareTag("MegamanAtaqueA")) //basico
         {
-            Damage(1);
+            Damage(1); // si balas basicas chocan deberian desparecer, las fuerets si traspasan?
         }
         else if(other.gameObject.CompareTag("MegamanAtaqueB")) //medio
         {

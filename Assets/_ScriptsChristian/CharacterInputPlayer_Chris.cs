@@ -433,7 +433,7 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 		    groundTolerance
 	    );
     	//print("isGrounded: " + isGrounded);
-    	Debug.DrawRay(transform.position , jumpDirection * groundTolerance, Color.yellow); 
+    	//Debug.DrawRay(transform.position , jumpDirection * groundTolerance, Color.yellow); 
 
     }
 
@@ -453,7 +453,7 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
     		isWallCollided = false;
 
     	Debug.Log("hay pared?: " + isWallCollided);
-    	Debug.DrawRay(centro , transform.forward * distancia, Color.yellow); 
+    	//Debug.DrawRay(centro , transform.forward * distancia, Color.yellow); 
     }
 
 /*
