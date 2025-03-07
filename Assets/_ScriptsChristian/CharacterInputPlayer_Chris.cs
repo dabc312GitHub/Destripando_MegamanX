@@ -63,7 +63,7 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 
 	private Vector3 PositionPlayer = Vector3.zero;
 	
-	public float jumpHeight = 1.5f;
+	public float jumpHeight = 1.5f;  // mejor dejarlo en 1 y jmSpeed en 5 da mejores resultados...
 
 	private GameObject bullet = null;
 	private float _counterFireShooting = 0.0f;
