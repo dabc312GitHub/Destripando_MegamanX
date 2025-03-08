@@ -10,6 +10,18 @@ public class AnimEvents : MonoBehaviour
    [SerializeField] private List<Transform> salidas;
    [SerializeField] private int velocidadProyectiles;
 
+   public List<Vector3>  getSalidas()
+   {
+      List<Vector3> salidasPos = new List<Vector3>();
+     
+      for(int i =0; i<salidas.Count; i++)
+      {
+         salidasPos.Add(salidas[i].position);         
+      }
+
+      return salidasPos;
+   }
+
   
    void Explota()
    {
@@ -18,7 +30,7 @@ public class AnimEvents : MonoBehaviour
         // al cabo de un rato delete la instancia y el enemigo?
    }
 
-   void GunVoltAttackA()
+   public void GunVoltAttackA() // qe reciba parametro segun lo que los raycast digan atacar donde detecte?
    {
 
         Transform proyectil;

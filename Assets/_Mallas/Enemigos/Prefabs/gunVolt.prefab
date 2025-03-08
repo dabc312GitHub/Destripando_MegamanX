@@ -222,9 +222,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b183f414a72aaae4096181261108cc15, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5353281748766508597}
-    - targetCorrespondingSourceObject: {fileID: 221426371191225869, guid: b183f414a72aaae4096181261108cc15, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b183f414a72aaae4096181261108cc15, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2270212912086620517}
+      addedObject: {fileID: 5213023532150562947}
   m_SourcePrefab: {fileID: 100100000, guid: b183f414a72aaae4096181261108cc15, type: 3}
 --- !u!1 &386505100800108740 stripped
 GameObject:
@@ -275,18 +275,13 @@ MonoBehaviour:
   - {fileID: 3827986988687900428}
   - {fileID: 7054164099710307345}
   velocidadProyectiles: 0
---- !u!1 &760800035815140248 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 221426371191225869, guid: b183f414a72aaae4096181261108cc15, type: 3}
-  m_PrefabInstance: {fileID: 692513682795271573}
-  m_PrefabAsset: {fileID: 0}
---- !u!65 &2270212912086620517
+--- !u!65 &5213023532150562947
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 760800035815140248}
+  m_GameObject: {fileID: 386505100800108740}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2

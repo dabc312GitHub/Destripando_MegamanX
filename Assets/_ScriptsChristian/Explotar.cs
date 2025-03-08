@@ -15,11 +15,11 @@ public class Explotar : MonoBehaviour
 
    private  Impacto ImpactoScript;
 
-   public List<Transform> poolExplosion;
-   public List<Transform> poolProyectiles;
+   public static List<Transform> poolExplosion = new List<Transform>();
+   public static List<Transform> poolProyectiles;
 
    private Vector3 posPool;
-  private Vector3 posEnemigos;
+   private Vector3 posEnemigos;
    private int indice;
 
    void Start()
@@ -37,13 +37,17 @@ public class Explotar : MonoBehaviour
         indice = 0;
         Transform exp;
         
-        for( int i =0; i< explosionesMax ; i++)
+        if(poolExplosion.Count == 0)
         {
-            exp =  Instantiate(explosion);
-            exp.gameObject.SetActive(false);
-            exp.position = posPool;
-            poolExplosion.Add(exp);
+             for( int i =0; i< explosionesMax ; i++)
+            {
+                exp =  Instantiate(explosion);
+                exp.gameObject.SetActive(false);
+                exp.position = posPool;
+                poolExplosion.Add(exp);
+            }
         }
+       
 
 
    }

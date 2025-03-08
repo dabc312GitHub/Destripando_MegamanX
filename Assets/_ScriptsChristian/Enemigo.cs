@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 public class Enemigo : MonoBehaviour
 {
@@ -33,7 +35,9 @@ public class Enemigo : MonoBehaviour
 
     private TipoEnemigo tipoEnemigo;
 
-    void Start()
+    private  AnimEvents animEventsScript;
+
+    void Start() // me parece que Enemigo.cs e Impacto.cs deberian fusionarse e incluir proyectil como tipo de enemigo
     {
         
         switch(id) //redundante?, deberia usar herencia? o interfaz? ya me olvide que es una interfaz
@@ -44,30 +48,38 @@ public class Enemigo : MonoBehaviour
                 break;
             case 1:
                 tipoEnemigo = TipoEnemigo.crusher;
+                IniCrusher();
                 break;
             case 2:
                 tipoEnemigo = TipoEnemigo.ball;
+                IniBall();
                 break;
             case 3:
                 tipoEnemigo = TipoEnemigo.gunVolt;
+                IniGunVolt();
                 break;
             case 4:
                 tipoEnemigo = TipoEnemigo.bee;
+                IniBee();
                 break;
             case 5:
                  tipoEnemigo = TipoEnemigo.bombbeen;
+                 IniBombBeen();
                  break;
             case 6:
                  tipoEnemigo = TipoEnemigo.jamminger;
+                 IniJamminger();
                  break;
            default:
                 tipoEnemigo = TipoEnemigo.roadAt;
+                IniRoadAt();
                 break;
         }
         animator = GetComponent<Animator>();
         mat = transform.GetChild(0).GetComponent<Renderer>().material;
         col = GetComponent<Collider>();
         explotaScript = GetComponent<Explotar>();
+        animEventsScript = GetComponent<AnimEvents>();
     }
 
     void Update()
@@ -82,11 +94,22 @@ public class Enemigo : MonoBehaviour
             }
         }
 
-        Debug.Log(vectorMov.x);
+       
         
         if(tipoEnemigo == TipoEnemigo.spiky)
         {
-            if( !bienMuerto && puntosDeVida==0 && vectorMov.x > -0.05f ) //recien quieto, puntos de vida 0 porque al inicio vectorx es zero
+            spiky_comportamiento();
+        }
+        else if( tipoEnemigo == TipoEnemigo.gunVolt)
+        {
+            gunVolt_comportamiento();
+
+        }
+    }
+
+    void spiky_comportamiento()
+    {
+        if( !bienMuerto && puntosDeVida==0 && vectorMov.x > -0.05f ) //recien quieto, puntos de vida 0 porque al inicio vectorx es zero
             {
                 //recien explotar solo Spiky fuera de evento de anim porque se mueve un poquito muertito
                 explotaScript.Explota();
@@ -116,8 +139,61 @@ public class Enemigo : MonoBehaviour
          
          if(!bienMuerto)  
             Movimiento(vectorMov); //Spiky tambien se mueve en una rampa a ver como la hago sin RigidBody :P, bueno lo logré maso :P
+    }
 
+    void gunVolt_comportamiento()
+    {
+        List<Vector3> salidas = animEventsScript.getSalidas();
+       
+        float alto = salidas[0].y;
+        float bajo = salidas[2].y;
+
+        
+
+        Vector3 origenA = new Vector3(salidas[4].x,alto,salidas[4].z );  //salidas[4];
+        Vector3 origenB = new Vector3(salidas[4].x,bajo,salidas[4].z );  //salidas[4];
+
+        RaycastHit hit;
+        float distancia = 8;
+        bool atacableA = Physics.Raycast(
+            origenA, 
+            new Vector3(-1,0,0),
+            out hit,
+            distancia
+        );
+
+        bool atacableB = Physics.Raycast(
+            origenB, 
+            new Vector3(-1,0,0),
+            out hit,
+            distancia
+        );
+
+        Debug.DrawRay(origenA , new Vector3(-1,0,0) * distancia, Color.yellow); 
+        Debug.DrawRay(origenB , new Vector3(-1,0,0) * distancia , Color.yellow);
+
+        if (hit.collider!=null)
+        {
+             if( hit.transform.gameObject.CompareTag("Player"))
+            {
+                animator.SetBool("Attack", true);
+                //ataque se dispara en la animacion 
+                StartCoroutine("Esperar",2);              
+                
+            }
+            else
+                 animator.SetBool("Attack", false);
         }
+           
+
+
+    }
+
+    IEnumerator Esperar(float sec) //solo para GunVolt?
+    {
+        yield return new WaitForSeconds(sec);
+        animator.SetBool("Attack", false); 
+        yield return null;
     }
 
     void FixedUpdate()
@@ -185,10 +261,17 @@ public class Enemigo : MonoBehaviour
 
         if( tipoEnemigo == TipoEnemigo.spiky)
         {
-            animator.SetTrigger("Muerte");
-            efectoDamage = false; //si muere deja de brillar?
-            mat.SetFloat("_Damage",0);           
+            animator.SetTrigger("Muerte");           
         }
+
+        else if(tipoEnemigo == TipoEnemigo.gunVolt)
+        {
+            animator.SetBool("Attack",false);
+            explotaScript.Explota();
+        }
+
+        efectoDamage = false; //si muere deja de brillar?
+        mat.SetFloat("_Damage",0);           
            
         
     }
