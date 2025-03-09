@@ -20,6 +20,13 @@ public class Enemigo : MonoBehaviour
     private Collider col;
     private Explotar explotaScript;
     private bool bienMuerto = false;
+    private bool derecha = false;
+
+    private Transform crusherCrusher = null;
+    private Transform crusherTarget = null; // simpre con un decimal en inspector o se malogra
+    private Vector3 crusherOri;
+    private bool crusherSubiendo = false;
+    private bool cicloCrusher = false;
 
     private enum TipoEnemigo
     {
@@ -30,7 +37,8 @@ public class Enemigo : MonoBehaviour
         bee,
         bombbeen,
         jamminger,
-        roadAt
+        roadAt,
+        otro  //maza del crusher y proyectiles tal vez deberian estar aqui
     }
 
     private TipoEnemigo tipoEnemigo;
@@ -70,9 +78,13 @@ public class Enemigo : MonoBehaviour
                  tipoEnemigo = TipoEnemigo.jamminger;
                  IniJamminger();
                  break;
-           default:
+           case 7:
                 tipoEnemigo = TipoEnemigo.roadAt;
                 IniRoadAt();
+                break;
+            default:
+                tipoEnemigo = TipoEnemigo.otro;
+                IniOtro();
                 break;
         }
         animator = GetComponent<Animator>();
@@ -93,12 +105,15 @@ public class Enemigo : MonoBehaviour
                 efectoDamage = false;
             }
         }
-
        
         
         if(tipoEnemigo == TipoEnemigo.spiky)
         {
             spiky_comportamiento();
+        }
+        else if (tipoEnemigo == TipoEnemigo.crusher)
+        {
+            crusher_comportamiento();
         }
         else if( tipoEnemigo == TipoEnemigo.gunVolt)
         {
@@ -162,7 +177,7 @@ public class Enemigo : MonoBehaviour
             distancia
         );
 
-        bool atacableB = Physics.Raycast(
+        bool atacableB = Physics.Raycast(  // no necesito ambos para la version sencilla
             origenB, 
             new Vector3(-1,0,0),
             out hit,
@@ -178,7 +193,7 @@ public class Enemigo : MonoBehaviour
             {
                 animator.SetBool("Attack", true);
                 //ataque se dispara en la animacion 
-                StartCoroutine("Esperar",2);              
+                StartCoroutine("EsperarGunVolt",2);              
                 
             }
             else
@@ -189,7 +204,126 @@ public class Enemigo : MonoBehaviour
 
     }
 
-    IEnumerator Esperar(float sec) //solo para GunVolt?
+    void crusher_comportamiento()
+    {
+        bool atacar = false;
+        float sentido = -1;
+        if (derecha)
+            sentido = 1;
+     
+        Quaternion rot; 
+        if (derecha)
+           rot = Quaternion.Euler(0, 160, 0);
+        else 
+           rot = Quaternion.Euler(0, 200, 0);
+
+         vectorMov.x = sentido * velocidadMov;
+     
+             
+       if(crusher_detector())
+       {
+              atacar = ( (int) Random.Range(0, 2) == 1 );
+            
+                
+                     
+               float valor =  Mathf.Round(transform.position.x * 10.0f) * 0.1f;
+              
+               if( Mathf.Approximately( valor, crusherTarget.position.x))
+                {
+                    atacar = true; //&& probabilidad luego
+                    vectorMov.x = 0;
+                     
+                     if(atacar) 
+                     {
+                        rot =  Quaternion.Euler(0, 180, 0);                        
+                       
+                        if ( cicloCrusher ) //se cumple ciclo
+                        {
+                            //inhabilitar ataque un tiempito
+                           vectorMov.x =  sentido * velocidadMov;
+                           atacar = false;
+                           StartCoroutine("EsperarCrusher", atacar);
+                        }
+                        else
+                         Crush();
+                    
+                    }
+                }
+       }
+
+        transform.rotation = Quaternion.Lerp(transform.rotation, rot, Time.deltaTime * 20f);
+
+       
+        Movimiento(vectorMov);
+    }
+
+    bool crusher_detector()
+    {
+
+        LayerMask layerMask = LayerMask.GetMask("PisoDestruible");
+        RaycastHit hit;
+        float distancia = 1.5f;
+        Vector3 origen = transform.position + new Vector3(0,-1,0);
+        bool ray = Physics.Raycast(
+            origen, 
+            Vector3.down,
+            out hit,
+            distancia,
+            layerMask
+        );
+
+        if(hit.collider)
+            crusherTarget =  hit.collider.transform.GetChild(0);
+       
+        //Debug.DrawRay(origen , Vector3.down * distancia, Color.yellow); 
+        return ray;
+        
+    }
+
+    void Crush ()
+    {
+        
+        Vector3 direccion = Vector3.down;
+        float valor = 0; 
+       
+       if(!crusherSubiendo) //bajando
+       {
+            crusherCrusher.position += (direccion * 2f * Time.deltaTime);
+            valor =  Mathf.Round(crusherCrusher.position.y * 10.0f) * 0.1f;
+             if(Mathf.Approximately(valor,crusherTarget.position.y )) // si choca target
+            {                
+                //destruir poco el piso y subir 
+                crusherSubiendo = true;
+            }
+            
+       }
+       else //subiendo
+       {
+            direccion.y = 1;            
+            crusherCrusher.position += (direccion * 0.5f * Time.deltaTime);
+            valor =  Mathf.Round(crusherCrusher.position.y * 10.0f) * 0.1f;
+             Debug.Log(valor + " " + crusherOri.y);
+            if( Mathf.Approximately(valor,crusherOri.y ))
+            {
+                Debug.Log("aquii");
+                crusherSubiendo = false;
+                cicloCrusher = true;
+                
+            }
+       }
+        
+       
+    }
+
+    IEnumerator EsperarCrusher(bool atacar) 
+    {
+        yield return new WaitForSeconds(2);
+        atacar = true;
+        cicloCrusher = false;
+        yield return null;
+    }
+
+    IEnumerator EsperarGunVolt(float sec) //solo para GunVolt?
     {
         yield return new WaitForSeconds(sec);
         animator.SetBool("Attack", false); 
@@ -206,6 +340,13 @@ public class Enemigo : MonoBehaviour
     void Movimiento(Vector3 vectorMov) 
     {
         transform.position += vectorMov * Time.deltaTime;
+    }
+
+    void Rotar()
+    {
+        derecha = !derecha;
+
+        //que rote pue
     }
 
     private float groundTolerance =0.1f;
@@ -270,6 +411,11 @@ public class Enemigo : MonoBehaviour
             explotaScript.Explota();
         }
 
+        else if(tipoEnemigo == TipoEnemigo.crusher)
+        {
+            explotaScript.Explota();
+        }
+
         efectoDamage = false; //si muere deja de brillar?
         mat.SetFloat("_Damage",0);           
            
@@ -308,7 +454,12 @@ public class Enemigo : MonoBehaviour
         ataqueCol = 4;
         ataqueA = 0;
         ataqueB = 0;
-        velocidadMov = 2;
+        velocidadMov = .8f;
+
+        crusherCrusher = transform.GetChild(2).GetChild(0).GetChild(0).GetChild(1); // no hay mejora manera?
+        crusherOri = crusherCrusher.position;
+        crusherOri.y =  Mathf.Round(crusherOri.y * 10.0f) * 0.1f; //redondeando a un decimal para comparar sin problemas
+
     }
 
     void IniBall()
@@ -365,6 +516,16 @@ public class Enemigo : MonoBehaviour
         velocidadMov = 3;
     }
 
+    void IniOtro()
+    {
+        puntosDeVida = 4; // si muere maza del crusher muere crusher, si muere con maza abajo masa cae 
+        ataqueCol = 4;
+
+        ataqueA = 0; 
+        ataqueB = 0;
+        velocidadMov = 0;
+    }
+
 
 
     void OnTriggerEnter(Collider other)
@@ -381,6 +542,11 @@ public class Enemigo : MonoBehaviour
         else if(other.gameObject.CompareTag("MegamanAtaqueC"))//alto
         {
             Damage(4);
+        }
+
+        if(other.gameObject.CompareTag("Limite"))
+        {
+            Rotar();
         }
     }
 
