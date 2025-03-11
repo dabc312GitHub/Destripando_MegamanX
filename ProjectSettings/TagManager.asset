@@ -14,7 +14,7 @@ TagManager:
   - MegamanAtaqueC
   - Proyectil
   - Limite
-  - PisoDestruible
+  - PisoOcupado
   layers:
   - Default
   - TransparentFX

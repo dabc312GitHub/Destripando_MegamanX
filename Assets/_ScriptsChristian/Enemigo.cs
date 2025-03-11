@@ -89,7 +89,11 @@ public class Enemigo : MonoBehaviour
                 break;
         }
         animator = GetComponent<Animator>();
-        mat = transform.GetChild(0).GetComponent<Renderer>().material;
+
+        if (tipoEnemigo != TipoEnemigo.otro)
+            mat = transform.GetChild(0).GetComponent<Renderer>().material;
+        else
+            mat =  null;
         col = GetComponent<Collider>();
         explotaScript = GetComponent<Explotar>();
         animEventsScript = GetComponent<AnimEvents>();
@@ -116,9 +120,9 @@ public class Enemigo : MonoBehaviour
         {
             if(!CrusherMirar)
              CrusherMirar = crusher_preComportamiento();
-
-             if(CrusherMirar)
-                crusher_comportamiento(); // si aparece megaman a la vista;
+             //CrusherMirar = true ; //Debug
+             if(CrusherMirar) // si aparece megaman a la vista;
+                crusher_comportamiento(); 
         }
         else if( tipoEnemigo == TipoEnemigo.gunVolt)
         {
@@ -194,6 +198,8 @@ public class Enemigo : MonoBehaviour
 
         if (hit.collider!=null)
         {
+            if( hit.transform.gameObject.CompareTag("Untagged") ) //solucionar Pared invisible corta el rayo, como la ignoro con mask en Raycast supongo
+                return;
              if( hit.transform.gameObject.CompareTag("Player"))
             {
                 animator.SetBool("Attack", true);
@@ -209,28 +215,37 @@ public class Enemigo : MonoBehaviour
 
     }
 
-    bool crusher_preComportamiento()
+    bool crusher_preComportamiento() //megaman a la vista
     {
         RaycastHit hit;
+        LayerMask layerMask = LayerMask.GetMask("Default"); // megaman en default, para evitar que choque con sus limites de movimiento
         float distancia = 6;
-        bool atacableA = Physics.Raycast(
-            transform.position + new Vector3(0,-1.1f,0), 
+        Vector3 origen = transform.position + new Vector3(0,-1.1f,0);
+        bool megaman = Physics.Raycast(
+            origen,
             new Vector3(-1,0,0),
             out hit,
-            distancia
+            distancia,
+            layerMask
         );
        
-        Debug.DrawRay(transform.position + new Vector3(0,-1.1f,0) , new Vector3(-1,0,0) * distancia, Color.yellow);
-        if (hit.collider!=null)
+        Debug.DrawRay(origen , new Vector3(-1,0,0) * distancia, Color.yellow);
+        if (megaman)
         {
+
              if( hit.transform.gameObject.CompareTag("Player"))
-               return true;
+             {
+                Debug.Log(hit.transform.gameObject);
+                return true;
+             }
+             return false;
+               
                
         }
         return false;
     }
 
-    void crusher_comportamiento()
+    void crusher_comportamiento() // tags para evitar que se bugee cuando hay muchos y coinciden casi al mismo tiempo en atacar mismo suelo, aparentemente funca
     {
         bool atacar = false;
         float sentido = -1;
@@ -252,7 +267,7 @@ public class Enemigo : MonoBehaviour
                      
             float valor =  Mathf.Round(transform.position.x * 10.0f) * 0.1f;
               
-            if( Mathf.Approximately( valor, crusherTarget.position.x))
+            if( Mathf.Approximately( valor, crusherTarget.position.x) && crusherTarget.tag!="PisoOcupado")
             {
 
                 atacar = true; //&& probabilidad luego
@@ -281,6 +296,7 @@ public class Enemigo : MonoBehaviour
                 }
             }
        }
+      
 
         transform.rotation = Quaternion.Lerp(transform.rotation, rot, Time.deltaTime * 20f);
 
@@ -322,6 +338,22 @@ public class Enemigo : MonoBehaviour
 
        ParticleSystem humo = crusherTarget.parent.GetChild(5).GetChild(0).GetComponent<ParticleSystem>();
        ParticleSystem escombros = crusherTarget.parent.GetChild(5).GetChild(1).GetComponent<ParticleSystem>();
+       float bajon1 =0;
+       float bajon2 = 0;
+       float bajon3 =0;
+       int x =0;
+       if (crusherTarget.parent.GetChild(2).gameObject.activeSelf)
+            x = 1; 
+       else if (crusherTarget.parent.GetChild(3).gameObject.activeSelf)
+            x= 2;
+
+       if(crusherTarget)
+       {
+             bajon1 =  crusherTarget.parent.position.y;// +0.4  -0.4f;
+             bajon2 =  crusherTarget.parent.position.y - 0.4f;
+             bajon3 = crusherTarget.parent.position.y -0.8f;
+       }
+      
 
        if(!crusherSubiendo) //bajando
        {
@@ -331,34 +363,47 @@ public class Enemigo : MonoBehaviour
             }
             else
             {
+                crusherTarget.parent.GetChild(1+x).tag="PisoOcupado";
                 crusherCrusher.position += (direccion * 2f * Time.deltaTime);
                 valor =  Mathf.Round(crusherCrusher.position.y * 10.0f) * 0.1f;
-                 if( Mathf.Approximately(valor,crusherTarget.position.y )) // si coincide en altura
+
+                                 
+                if( Mathf.Approximately(valor,crusherTarget.position.y) ) // si coincide en altura
                 {                
                     //destruir poco el piso y subir // a veces rompe hasta dos bloques? o 3?
+                    
+                    float posY = crusherTarget.position.y - 0.4f;
+                    posY = Mathf.Round( posY * 10.0f  ) * 0.1f;                   
+                    crusherTarget.position = new Vector3(crusherTarget.position.x,posY,crusherTarget.position.z);                     
+                    escombros.transform.parent.position +=  new Vector3(0, -0.4f ,0);
+                  
+                    crusherTarget.parent.GetChild(5).gameObject.SetActive(true);
+                    crusherTarget.parent.GetChild(1).gameObject.SetActive(false);   
 
-                     crusherTarget.position += new Vector3(0, -0.4f ,0);
-                     escombros.transform.parent.position +=  new Vector3(0, -0.4f ,0);
+                    //Debug.Log(crusherTarget.position);                                         
+                     
                    
-                     crusherTarget.parent.GetChild(1).gameObject.SetActive(false);
-                     crusherTarget.parent.GetChild(5).gameObject.SetActive(true);
-                     if( Mathf.Approximately(crusherTarget.position.y, 0) )
+                     if( Mathf.Approximately(crusherTarget.position.y, bajon1) )  // 0  //crusherTarget.position.y
                      {
-                        crusherTarget.parent.GetChild(1).gameObject.SetActive(false);
                         crusherTarget.parent.GetChild(2).gameObject.SetActive(true);
+                        crusherTarget.parent.GetChild(1).gameObject.SetActive(false);                       
 
                      }
 
-                     else if(  Mathf.Approximately(crusherTarget.position.y,0.5f ))
-                     {
-                      
+                     if(  Mathf.Approximately(crusherTarget.position.y,bajon2 ))  //.5
+                     {                      
+                        
                         crusherTarget.parent.GetChild(2).gameObject.SetActive(false);
                         crusherTarget.parent.GetChild(3).gameObject.SetActive(true);
+                        humo.Stop();
+                        humo.Play();
+                        escombros.Stop();
+                        escombros.Play();
 
                      }
 
-                     else if (  Mathf.Approximately(crusherTarget.position.y, 0.1f ) )
-                     {
+                     else if (  Mathf.Approximately(crusherTarget.position.y, bajon3 ) ) //.1
+                     {                        
                         crusherTarget.parent.GetChild(3).gameObject.SetActive(false);
                         crusherTarget.parent.GetChild(4).gameObject.SetActive(true);
                         
@@ -367,11 +412,12 @@ public class Enemigo : MonoBehaviour
                         escombros.Stop();
                         escombros.Play();
                         crusherTarget.gameObject.SetActive(false);
-                     }   
+                     }
 
-                     
+
                                   
                      crusherSubiendo = true;
+
                 }
             }
            
@@ -379,6 +425,7 @@ public class Enemigo : MonoBehaviour
        }
        else //subiendo
        {
+            crusherTarget.parent.GetChild(1+x).tag="Untagged";
             direccion.y = 1;            
             crusherCrusher.position += (direccion * 0.7f * Time.deltaTime);
             valor =  Mathf.Round(crusherCrusher.position.y * 10.0f) * 0.1f;
@@ -495,7 +542,8 @@ public class Enemigo : MonoBehaviour
         }
 
         efectoDamage = false; //si muere deja de brillar?
-        mat.SetFloat("_Damage",0);           
+        if(mat)
+            mat.SetFloat("_Damage",0);           
            
         
     }
@@ -507,8 +555,9 @@ public class Enemigo : MonoBehaviour
 
         efectoDamage = true;
 
-        puntosDeVida -=d;        
-        mat.SetFloat("_Damage",1);
+        puntosDeVida -=d;
+        if(mat)        
+            mat.SetFloat("_Damage",1);
 
         if(puntosDeVida <=0)
             Muerte();
@@ -596,7 +645,7 @@ public class Enemigo : MonoBehaviour
 
     void IniOtro()
     {
-        puntosDeVida = 4; // si muere maza del crusher muere crusher, si muere con maza abajo masa cae 
+        puntosDeVida = 9999; // no recibe daño(otro modo que no sea 9999?), si muere con maza abajo masa cae 
         ataqueCol = 4;
 
         ataqueA = 0; 
@@ -608,14 +657,21 @@ public class Enemigo : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        /*
+        if(other.gameObject.CompareTag("ZonaMuerte")) // no funca
+        {
+            Destroy(this);
+        }*/
+
 
         if(other.gameObject.CompareTag("MegamanAtaqueA")) //basico
         {
             Damage(1); // si balas basicas chocan deberian desparecer, las fuerets si traspasan?
+            Destroy(other.gameObject); // ?? mejor pooling pero de momento no
         }
         else if(other.gameObject.CompareTag("MegamanAtaqueB")) //medio
         {
-             Damage(2);
+             Damage(2); //deberian desaparecer al cabo de un tiempo..., tal vez pared invisible pegado a megaman
         }
         else if(other.gameObject.CompareTag("MegamanAtaqueC"))//alto
         {

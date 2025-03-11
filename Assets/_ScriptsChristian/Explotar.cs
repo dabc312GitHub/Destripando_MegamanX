@@ -60,12 +60,21 @@ public class Explotar : MonoBehaviour
         {
             if(!invulnerable)
             {
+                Enemigo enemigoScript = transform.GetComponent<Enemigo>();
+                if( enemigoScript)
+                    Col.transform.parent.GetComponent<Impacto>().Damage(enemigoScript.getAtaqueCol()); //daño por chocar enemigos
+
                 if( gameObject.CompareTag("Proyectil")) //plasma se comporta como proyectil pero no explota, ver eso luego
                 {
                     Explota();// solo explota si es proyectil
+                     Col.transform.parent.GetComponent<Impacto>().Damage(2f); // todos hacen daño 2? //Plasma necesita su tag
                     // y desparece
                 }
-                Col.transform.parent.GetComponent<Animator>().SetTrigger("Damage");
+                Col.transform.parent.GetComponent<Animator>().SetTrigger("Damage"); //Impacto se llama en anim
+
+
+
+
                 invulnerable = true;
                 ImpactoScript.getExtension().enabled = false;   
                 matA.SetFloat("_Invulnerable",1.0f);

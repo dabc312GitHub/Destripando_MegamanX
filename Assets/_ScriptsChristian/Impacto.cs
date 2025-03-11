@@ -69,18 +69,18 @@ public class Impacto : MonoBehaviour
             //megamanMatA.SetFloat("_Invulnerable",1.0f);
             //megamanMatB.SetFloat("_Invulnerable",1.0f);
 
-
+         /*   
          //temporal
             vida -= 3; 
             vidaUI.SetFloat("_Salud", vida/vidaMaxima);
         if( vida <= 0)
             Muerte(); 
-        // temporal
+        // temporal*/
 
         }
     }
 
-    void Damage (float d)
+    public void Damage (float d)
     {
         vida -= d; 
         if( vida <= 0)
@@ -133,17 +133,41 @@ public class Impacto : MonoBehaviour
     void OnTriggerEnter(Collider other) // a veces no entra por el character controller que es raro?
     {
         
+
+        if(other.gameObject.CompareTag("Player"))
+            return;
+        
         if(other.gameObject.CompareTag("ZonaMuerte"))
         {
             Muerte();
         }
-
+        /*
         if(other.gameObject.CompareTag("En_Spiky"))
         {
             float damage = other.transform.GetComponent<Enemigo>().getAtaqueCol();
             Damage(damage); // daño en megaman debe interrumpir su movimiento brevemente
-        }
-               
+        }*/
+
+        /*
+        else
+        {
+            float damage = 0;
+            Debug.Log("AUUU " + other.gameObject);
+            Enemigo EnemigoScript = other.transform.GetComponent<Enemigo>();
+            if (EnemigoScript)
+            {
+                 damage = other.transform.GetComponent<Enemigo>().getAtaqueCol();
+                 Damage(damage); // daño en megaman debe interrumpir su movimiento brevemente
+            }
+
+            if(other.gameObject.CompareTag("Proyectil")) // todos hacen daño 2....jeej
+            {
+                Damage(2f);
+            }
+        }*/
+   
     }
+              
+   
    
 }
