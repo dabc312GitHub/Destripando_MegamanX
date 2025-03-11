@@ -27,6 +27,7 @@ public class Enemigo : MonoBehaviour
     private Vector3 crusherOri;
     private bool crusherSubiendo = false;
     private bool cicloCrusher = false;
+    private bool CrusherMirar = false;
 
     private enum TipoEnemigo
     {
@@ -113,7 +114,11 @@ public class Enemigo : MonoBehaviour
         }
         else if (tipoEnemigo == TipoEnemigo.crusher)
         {
-            crusher_comportamiento();
+            if(!CrusherMirar)
+             CrusherMirar = crusher_preComportamiento();
+
+             if(CrusherMirar)
+                crusher_comportamiento(); // si aparece megaman a la vista;
         }
         else if( tipoEnemigo == TipoEnemigo.gunVolt)
         {
@@ -122,7 +127,7 @@ public class Enemigo : MonoBehaviour
         }
     }
 
-    void spiky_comportamiento()
+    void spiky_comportamiento() // debe dañar hasta que explota faltaria eso...
     {
         if( !bienMuerto && puntosDeVida==0 && vectorMov.x > -0.05f ) //recien quieto, puntos de vida 0 porque al inicio vectorx es zero
             {
@@ -184,8 +189,8 @@ public class Enemigo : MonoBehaviour
             distancia
         );
 
-        Debug.DrawRay(origenA , new Vector3(-1,0,0) * distancia, Color.yellow); 
-        Debug.DrawRay(origenB , new Vector3(-1,0,0) * distancia , Color.yellow);
+        //Debug.DrawRay(origenA , new Vector3(-1,0,0) * distancia, Color.yellow); 
+        //Debug.DrawRay(origenB , new Vector3(-1,0,0) * distancia , Color.yellow);
 
         if (hit.collider!=null)
         {
@@ -202,6 +207,27 @@ public class Enemigo : MonoBehaviour
            
 
 
+    }
+
+    bool crusher_preComportamiento()
+    {
+        RaycastHit hit;
+        float distancia = 6;
+        bool atacableA = Physics.Raycast(
+            transform.position + new Vector3(0,-1.1f,0), 
+            new Vector3(-1,0,0),
+            out hit,
+            distancia
+        );
+       
+        Debug.DrawRay(transform.position + new Vector3(0,-1.1f,0) , new Vector3(-1,0,0) * distancia, Color.yellow);
+        if (hit.collider!=null)
+        {
+             if( hit.transform.gameObject.CompareTag("Player"))
+               return true;
+               
+        }
+        return false;
     }
 
     void crusher_comportamiento()
@@ -222,33 +248,38 @@ public class Enemigo : MonoBehaviour
              
        if(crusher_detector())
        {
-              atacar = ( (int) Random.Range(0, 2) == 1 );
-            
-                
+            atacar = ( (int) Random.Range(0, 2) == 1 ); 
                      
-               float valor =  Mathf.Round(transform.position.x * 10.0f) * 0.1f;
+            float valor =  Mathf.Round(transform.position.x * 10.0f) * 0.1f;
               
-               if( Mathf.Approximately( valor, crusherTarget.position.x))
+            if( Mathf.Approximately( valor, crusherTarget.position.x))
+            {
+
+                atacar = true; //&& probabilidad luego
+
+                                
+                if(atacar) 
                 {
-                    atacar = true; //&& probabilidad luego
                     vectorMov.x = 0;
-                     
-                     if(atacar) 
-                     {
-                        rot =  Quaternion.Euler(0, 180, 0);                        
-                       
-                        if ( cicloCrusher ) //se cumple ciclo
-                        {
-                            //inhabilitar ataque un tiempito
-                           vectorMov.x =  sentido * velocidadMov;
-                           atacar = false;
-                           StartCoroutine("EsperarCrusher", atacar);
-                        }
-                        else
-                         Crush();
-                    
+                    rot =  Quaternion.Euler(0, 180, 0);                        
+                   
+                    if ( cicloCrusher ) //se cumple ciclo
+                    {
+                        //inhabilitar ataque un tiempito
+                       vectorMov.x =  sentido * velocidadMov;
+                        if (derecha)
+                           rot = Quaternion.Euler(0, 160, 0);
+                        else 
+                           rot = Quaternion.Euler(0, 200, 0);
+                       atacar = false;
+                       StartCoroutine("EsperarCrusher", atacar);
+
                     }
+                    else
+                     Crush();
+                
                 }
+            }
        }
 
         transform.rotation = Quaternion.Lerp(transform.rotation, rot, Time.deltaTime * 20f);
@@ -273,7 +304,10 @@ public class Enemigo : MonoBehaviour
         );
 
         if(hit.collider)
-            crusherTarget =  hit.collider.transform.GetChild(0);
+        {
+            //crusherTarget =  hit.collider.transform.GetChild(0);
+            crusherTarget =  hit.collider.transform.parent.GetChild(0);
+        }
        
         //Debug.DrawRay(origen , Vector3.down * distancia, Color.yellow); 
         return ray;
@@ -285,30 +319,74 @@ public class Enemigo : MonoBehaviour
         
         Vector3 direccion = Vector3.down;
         float valor = 0; 
-       
+
+       ParticleSystem humo = crusherTarget.parent.GetChild(5).GetChild(0).GetComponent<ParticleSystem>();
+       ParticleSystem escombros = crusherTarget.parent.GetChild(5).GetChild(1).GetComponent<ParticleSystem>();
+
        if(!crusherSubiendo) //bajando
        {
-            crusherCrusher.position += (direccion * 2f * Time.deltaTime);
-            valor =  Mathf.Round(crusherCrusher.position.y * 10.0f) * 0.1f;
-             if(Mathf.Approximately(valor,crusherTarget.position.y )) // si choca target
-            {                
-                //destruir poco el piso y subir 
-                crusherSubiendo = true;
+            if(!crusherTarget.gameObject.activeSelf ) // si ya no hay tierrita abajo
+            {
+                 cicloCrusher = true;
             }
+            else
+            {
+                crusherCrusher.position += (direccion * 2f * Time.deltaTime);
+                valor =  Mathf.Round(crusherCrusher.position.y * 10.0f) * 0.1f;
+                 if( Mathf.Approximately(valor,crusherTarget.position.y )) // si coincide en altura
+                {                
+                    //destruir poco el piso y subir // a veces rompe hasta dos bloques? o 3?
+
+                     crusherTarget.position += new Vector3(0, -0.4f ,0);
+                     escombros.transform.parent.position +=  new Vector3(0, -0.4f ,0);
+                   
+                     crusherTarget.parent.GetChild(1).gameObject.SetActive(false);
+                     crusherTarget.parent.GetChild(5).gameObject.SetActive(true);
+                     if( Mathf.Approximately(crusherTarget.position.y, 0) )
+                     {
+                        crusherTarget.parent.GetChild(1).gameObject.SetActive(false);
+                        crusherTarget.parent.GetChild(2).gameObject.SetActive(true);
+
+                     }
+
+                     else if(  Mathf.Approximately(crusherTarget.position.y,0.5f ))
+                     {
+                      
+                        crusherTarget.parent.GetChild(2).gameObject.SetActive(false);
+                        crusherTarget.parent.GetChild(3).gameObject.SetActive(true);
+
+                     }
+
+                     else if (  Mathf.Approximately(crusherTarget.position.y, 0.1f ) )
+                     {
+                        crusherTarget.parent.GetChild(3).gameObject.SetActive(false);
+                        crusherTarget.parent.GetChild(4).gameObject.SetActive(true);
+                        
+                        humo.Stop();
+                        humo.Play();
+                        escombros.Stop();
+                        escombros.Play();
+                        crusherTarget.gameObject.SetActive(false);
+                     }   
+
+                     
+                                  
+                     crusherSubiendo = true;
+                }
+            }
+           
             
        }
        else //subiendo
        {
             direccion.y = 1;            
-            crusherCrusher.position += (direccion * 0.5f * Time.deltaTime);
+            crusherCrusher.position += (direccion * 0.7f * Time.deltaTime);
             valor =  Mathf.Round(crusherCrusher.position.y * 10.0f) * 0.1f;
-             Debug.Log(valor + " " + crusherOri.y);
+             //Debug.Log(valor + " " + crusherOri.y);
             if( Mathf.Approximately(valor,crusherOri.y ))
-            {
-                Debug.Log("aquii");
+            {                
                 crusherSubiendo = false;
-                cicloCrusher = true;
-                
+                cicloCrusher = true;                
             }
        }
         
@@ -413,7 +491,7 @@ public class Enemigo : MonoBehaviour
 
         else if(tipoEnemigo == TipoEnemigo.crusher)
         {
-            explotaScript.Explota();
+            explotaScript.Explota(); //la maza no se destruye, el cuerpo explota y la maza debería caer al infinito o explotar al contacto del suelo
         }
 
         efectoDamage = false; //si muere deja de brillar?
