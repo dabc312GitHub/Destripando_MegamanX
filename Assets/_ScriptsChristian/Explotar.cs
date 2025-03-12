@@ -62,7 +62,7 @@ public class Explotar : MonoBehaviour
             {
                 Enemigo enemigoScript = transform.GetComponent<Enemigo>();
                 if( enemigoScript)
-                    Col.transform.parent.GetComponent<Impacto>().Damage(enemigoScript.getAtaqueCol()); //daño por chocar enemigos
+                    Col.transform.parent.GetComponent<Impacto>().Damage(enemigoScript.getAtaqueCol()); //daño por chocar enemigos //puede que a veces choque con characterController?
 
                 if( gameObject.CompareTag("Proyectil")) //plasma se comporta como proyectil pero no explota, ver eso luego
                 {
@@ -119,7 +119,7 @@ public class Explotar : MonoBehaviour
 
    IEnumerator MoverExplosion(int i)
    {
-        this.transform. position = posEnemigos;
+        this.transform.position = posEnemigos;
         yield return new WaitForSeconds(2);
         poolExplosion[i].transform.position = posPool;
         poolExplosion[i].gameObject.SetActive(false);

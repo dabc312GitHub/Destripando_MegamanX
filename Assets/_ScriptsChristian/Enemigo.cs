@@ -101,6 +101,7 @@ public class Enemigo : MonoBehaviour
         col = GetComponent<Collider>();
         explotaScript = GetComponent<Explotar>();
         animEventsScript = GetComponent<AnimEvents>();
+
     }
 
     void Update()
@@ -139,6 +140,7 @@ public class Enemigo : MonoBehaviour
 
     void spiky_comportamiento() // debe dañar hasta que explota faltaria eso...
     {
+        
         if( !bienMuerto && puntosDeVida==0 && vectorMov.x > -0.05f ) //recien quieto, puntos de vida 0 porque al inicio vectorx es zero
             {
                 //recien explotar solo Spiky fuera de evento de anim porque se mueve un poquito muertito
@@ -161,14 +163,16 @@ public class Enemigo : MonoBehaviour
                    
                 }
                 else
-                    vectorMov.x = -1 *velocidadMov;
+                  vectorMov.x = -1 *velocidadMov;
+                
 
                 if(!isGrounded)    
                     vectorMov.y += Physics.gravity.y * Time.deltaTime * 0.1f;
             }
          
          if(!bienMuerto)  
-            Movimiento(vectorMov); //Spiky tambien se mueve en una rampa a ver como la hago sin RigidBody :P, bueno lo logré maso :P
+            Movimiento(vectorMov); //Spiky tambien se mueve en una rampa a ver como la hago sin RigidBody :P, bueno lo logré maso :P*/
+            
     }
 
     void gunVolt_comportamiento()
@@ -472,7 +476,7 @@ public class Enemigo : MonoBehaviour
 
     void Movimiento(Vector3 vectorMov) 
     {
-        transform.position += vectorMov * Time.deltaTime;
+        transform.position += vectorMov * Time.deltaTime;                
     }
 
     void Rotar()
