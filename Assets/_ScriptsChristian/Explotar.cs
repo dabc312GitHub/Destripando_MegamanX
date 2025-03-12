@@ -72,9 +72,6 @@ public class Explotar : MonoBehaviour
                 }
                 Col.transform.parent.GetComponent<Animator>().SetTrigger("Damage"); //Impacto se llama en anim
 
-
-
-
                 invulnerable = true;
                 ImpactoScript.getExtension().enabled = false;   
                 matA.SetFloat("_Invulnerable",1.0f);

@@ -1,10 +1,14 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Playables;
 
 public class Enemigo : MonoBehaviour
 {
-    [SerializeField] public int id = 0;
+    [SerializeField] private PlayableDirector abejaDirector;
+    [SerializeField] private Camera camara;
+    [SerializeField] private Transform sueloAbeja;
+    [SerializeField] private int id = 0;
     private float puntosDeVida;
     private float ataqueA;
     private float ataqueB;
@@ -130,6 +134,7 @@ public class Enemigo : MonoBehaviour
             gunVolt_comportamiento();
 
         }
+        //bee se maneja con timeline
     }
 
     void spiky_comportamiento() // debe dañar hasta que explota faltaria eso...
@@ -217,6 +222,20 @@ public class Enemigo : MonoBehaviour
 
 
     }
+
+    IEnumerator EsperarGunVolt(float sec) //solo para GunVolt?
+    {
+        yield return new WaitForSeconds(sec);
+        animator.SetBool("Attack", false); 
+        yield return null;
+    }
+
+    void FixedUpdate()
+    {
+        GroundedCheck();
+        if(!isWallCollided) // solo una vez?
+            WallCheck();
+    } 
 
     bool crusher_preComportamiento() //megaman a la vista
     {
@@ -451,20 +470,6 @@ public class Enemigo : MonoBehaviour
         yield return null;
     }
 
-    IEnumerator EsperarGunVolt(float sec) //solo para GunVolt?
-    {
-        yield return new WaitForSeconds(sec);
-        animator.SetBool("Attack", false); 
-        yield return null;
-    }
-
-    void FixedUpdate()
-    {
-        GroundedCheck();
-        if(!isWallCollided) // solo una vez?
-            WallCheck();
-    } 
-
     void Movimiento(Vector3 vectorMov) 
     {
         transform.position += vectorMov * Time.deltaTime;
@@ -528,6 +533,10 @@ public class Enemigo : MonoBehaviour
             col.enabled = false;
         puntosDeVida = 0;
 
+        efectoDamage = false; //si muere deja de brillar?
+        if(mat)
+            mat.SetFloat("_Damage",0); 
+
         if( tipoEnemigo == TipoEnemigo.spiky)
         {
             animator.SetTrigger("Muerte");           
@@ -544,9 +553,18 @@ public class Enemigo : MonoBehaviour
             explotaScript.Explota(); //la maza no se destruye, el cuerpo explota y la maza debería caer al infinito o explotar al contacto del suelo
         }
 
-        efectoDamage = false; //si muere deja de brillar?
-        if(mat)
-            mat.SetFloat("_Damage",0);           
+        else if(tipoEnemigo == TipoEnemigo.bee)
+        {
+            abejaDirector.Stop();
+            transform.position = new Vector3 (0,-30,0);
+            //Piso caerse
+            sueloAbeja.GetComponent<Rigidbody>().isKinematic = false;
+            sueloAbeja.GetComponent<Rigidbody>().useGravity = true;
+            //camara resucita
+            camara.GetComponent<CameraMove>().setCamaraQuieta(false); 
+            //Activar Abeja Destruida
+
+        }                  
            
         
     }

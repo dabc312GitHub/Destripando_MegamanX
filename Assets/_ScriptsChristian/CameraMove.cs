@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Playables;
 
 public class CameraMove : MonoBehaviour
 {
@@ -7,13 +8,22 @@ public class CameraMove : MonoBehaviour
     [SerializeField] private float offsetY = 1f;
     [SerializeField] private float offsetX = 1f;
 
+    [SerializeField] private PlayableDirector directorAbeja;
+
+    private Transform limiteA;
+    private Transform limiteB;
+
+
     private Vector3 nosePaqueSirve = Vector3.zero;
     private CharacterInputPlayer_Chris characterScript;
     private bool camaraQuieta = false;
 
+    
+
     void Start()
     {
-        characterScript=GameObject.Find("megamanxCompleto").GetComponent<CharacterInputPlayer_Chris>();
+        characterScript = GameObject.Find("megamanxCompleto").GetComponent<CharacterInputPlayer_Chris>();
+        
     }
    
 
@@ -36,13 +46,24 @@ public class CameraMove : MonoBehaviour
     public void setCamaraQuieta ( bool quieta) //cuando muere abeja llamar
     {
         camaraQuieta = quieta;
+        //no deberia estar en un metodo Set 
+        limiteA.parent.gameObject.SetActive(false);
+
+    }
+
+    public void Reanudar()
+    {
+
     }
 
     void OnTriggerEnter(Collider col)
     {
         camaraQuieta = true;
-        col.transform.GetChild(0).GetComponent<Collider>().enabled = true; //deberia tenerlas en variables guardadas para desactivarlas luego?
-        col.transform.GetChild(1).GetComponent<Collider>().enabled = true;
+        limiteA = col.transform.GetChild(0);
+        limiteB = col.transform.GetChild(1);
+        limiteA.GetComponent<Collider>().enabled = true; 
+        limiteB.GetComponent<Collider>().enabled = true;
         col.transform.GetComponent<Collider>().enabled = false;
+        directorAbeja.Play();
     }
 }
