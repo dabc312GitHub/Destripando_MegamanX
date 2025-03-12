@@ -9,6 +9,7 @@ public class CameraMove : MonoBehaviour
 
     private Vector3 nosePaqueSirve = Vector3.zero;
     private CharacterInputPlayer_Chris characterScript;
+    private bool camaraQuieta = false;
 
     void Start()
     {
@@ -26,8 +27,22 @@ public class CameraMove : MonoBehaviour
             offsetX = 2f;
          Vector3 nuevaPos = Vector3.SmoothDamp( transform.position, target.position + new Vector3(offsetX,offsetY,0) , ref nosePaqueSirve , factorPos * Time.deltaTime);// + offset ;
 
-        transform.position = new Vector3(nuevaPos.x,  nuevaPos.y,transform.position.z);
+        if(!camaraQuieta)
+            transform.position = new Vector3(nuevaPos.x,  nuevaPos.y,transform.position.z);
 
 
+    }
+
+    public void setCamaraQuieta ( bool quieta) //cuando muere abeja llamar
+    {
+        camaraQuieta = quieta;
+    }
+
+    void OnTriggerEnter(Collider col)
+    {
+        camaraQuieta = true;
+        col.transform.GetChild(0).GetComponent<Collider>().enabled = true; //deberia tenerlas en variables guardadas para desactivarlas luego?
+        col.transform.GetChild(1).GetComponent<Collider>().enabled = true;
+        col.transform.GetComponent<Collider>().enabled = false;
     }
 }

@@ -106,7 +106,8 @@ public class Enemigo : MonoBehaviour
             contadorEfectoDamage -=Time.deltaTime;
             if(contadorEfectoDamage <= 0)
             {
-                mat.SetFloat("_Damage",0);
+                if(mat)
+                    mat.SetFloat("_Damage",0);
                 efectoDamage = false;
             }
         }
@@ -178,28 +179,30 @@ public class Enemigo : MonoBehaviour
         Vector3 origenB = new Vector3(salidas[4].x,bajo,salidas[4].z );  //salidas[4];
 
         RaycastHit hit;
+         LayerMask layerMask = LayerMask.GetMask("Default"); // ignora paredes invisiblse
         float distancia = 8;
         bool atacableA = Physics.Raycast(
             origenA, 
             new Vector3(-1,0,0),
             out hit,
-            distancia
+            distancia,
+            layerMask
         );
-
+        /*
         bool atacableB = Physics.Raycast(  // no necesito ambos para la version sencilla
             origenB, 
             new Vector3(-1,0,0),
             out hit,
             distancia
-        );
+        );*/
 
         //Debug.DrawRay(origenA , new Vector3(-1,0,0) * distancia, Color.yellow); 
         //Debug.DrawRay(origenB , new Vector3(-1,0,0) * distancia , Color.yellow);
 
         if (hit.collider!=null)
         {
-            if( hit.transform.gameObject.CompareTag("Untagged") ) //solucionar Pared invisible corta el rayo, como la ignoro con mask en Raycast supongo
-                return;
+         /*   if( hit.transform.gameObject.CompareTag("Untagged") ) //solucionar Pared invisible corta el rayo, como la ignoro con mask en Raycast supongo
+                return;*/
              if( hit.transform.gameObject.CompareTag("Player"))
             {
                 animator.SetBool("Attack", true);
