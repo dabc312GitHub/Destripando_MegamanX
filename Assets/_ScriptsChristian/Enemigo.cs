@@ -9,6 +9,9 @@ public class Enemigo : MonoBehaviour
     [SerializeField] private Camera camara;
     [SerializeField] private Transform sueloAbeja;
     [SerializeField] private int id = 0;
+    [SerializeField] private Transform salidaMisiles;
+    [SerializeField] private Transform misil;
+
     private float puntosDeVida;
     private float ataqueA;
     private float ataqueB;
@@ -135,7 +138,15 @@ public class Enemigo : MonoBehaviour
             gunVolt_comportamiento();
 
         }
-        //bee se maneja con timeline
+        //movimiento de bee se maneja con timeline
+        else if ( tipoEnemigo == TipoEnemigo.bee)
+        {
+            if(activarBee)
+                bee_comportamiento();
+            contadorBee += Time.deltaTime;
+            if(contadorBee > 3)
+                activarBee= true;
+        }
     }
 
     void spiky_comportamiento() // debe dañar hasta que explota faltaria eso...
@@ -233,6 +244,7 @@ public class Enemigo : MonoBehaviour
         animator.SetBool("Attack", false); 
         yield return null;
     }
+
 
     void FixedUpdate()
     {
@@ -473,6 +485,68 @@ public class Enemigo : MonoBehaviour
         cicloCrusher = false;
         yield return null;
     }
+
+    private float contadorBee = 0;
+    private bool activarBee = false;
+    void bee_comportamiento()
+    {
+        Vector3 origenA = salidaMisiles.position;       
+
+        RaycastHit hit;
+        LayerMask layerMask = LayerMask.GetMask("Default"); // ignora paredes invisiblse
+        float distancia = 5;
+        bool atacableA = Physics.Raycast(
+            origenA, 
+            new Vector3(-1,0,0),
+            out hit,
+            distancia,
+            layerMask
+        );
+
+        
+        if (atacableA)
+        {    
+            if( hit.transform.gameObject.CompareTag("Player"))
+            {               
+               ataqueMisil();
+               contadorBee = 0;
+               activarBee = false;
+            }
+        }
+
+    }
+
+    public void ataqueMisil() 
+   {
+
+        Transform proyectil;
+        proyectil =  Instantiate(misil);         
+
+        proyectil.position = salidaMisiles.position; 
+        StartCoroutine("moverAtaque",proyectil);
+   }
+
+
+     IEnumerator EsperarBee(float sec) // para bee 
+    {
+        yield return new WaitForSeconds(sec);   
+        ataqueMisil();
+        yield return null;
+    }
+
+   IEnumerator moverAtaque(Transform attack) 
+   {
+      float tiempo = 5.0f;
+      while (tiempo > 0)
+      {
+         attack.position += Vector3.left * Time.deltaTime * 3.0f; 
+         tiempo -=Time.deltaTime;
+         //Destroy(attack.gameObject);
+         yield return null;
+      }
+      attack.position = new Vector3(0,-20,0);
+      yield return null; 
+   }
 
     void Movimiento(Vector3 vectorMov) 
     {

@@ -70,6 +70,9 @@ public class Explotar : MonoBehaviour
                      Col.transform.parent.GetComponent<Impacto>().Damage(2f); // todos hacen daño 2? //Plasma necesita su tag
                     // y desparece
                 }
+                else
+                     Col.transform.parent.GetComponent<Impacto>().Damage(1f); // plasma y disparo de bee y otros?
+
                 Col.transform.parent.GetComponent<Animator>().SetTrigger("Damage"); //Impacto se llama en anim
 
                 invulnerable = true;

@@ -30,7 +30,7 @@ public class AnimEvents : MonoBehaviour
         // al cabo de un rato delete la instancia y el enemigo?
    }
 
-   public void GunVoltAttackA() // qe reciba parametro segun lo que los raycast digan atacar donde detecte?
+   public void GunVoltAttackA() // qe reciba parametro segun lo que los raycast digan atacar donde detecte?, tambien se usa en bee, ayayay este código (yo soy artista)
    {
 
         Transform proyectil;
@@ -51,12 +51,12 @@ public class AnimEvents : MonoBehaviour
         proyectil.position = salidas[index].position;
 
 
-        moverAtaque(proyectil,explota);
+       // moverAtaque(proyectil,explota);
         StartCoroutine(moverAtaque(proyectil, explota));
 
    }
 
-   IEnumerator moverAtaque(Transform attack, bool explota)
+   IEnumerator moverAtaque(Transform attack, bool explota) //necesito ese bool?
    {
       float tiempo = 5.0f;
       while (tiempo > 0)
