@@ -36,6 +36,11 @@ public class Enemigo : MonoBehaviour
     private bool cicloCrusher = false;
     private bool CrusherMirar = false;
 
+    private bool bombbeenRetirada = false;
+    [SerializeField] private Transform bombbeenMina;
+
+    private Transform megaman;
+
     private enum TipoEnemigo
     {
         spiky,
@@ -105,6 +110,9 @@ public class Enemigo : MonoBehaviour
         explotaScript = GetComponent<Explotar>();
         animEventsScript = GetComponent<AnimEvents>();
 
+        megaman = GameObject.Find("megamanxCompleto").transform;
+
+
     }
 
     void Update()
@@ -124,6 +132,10 @@ public class Enemigo : MonoBehaviour
         if(tipoEnemigo == TipoEnemigo.spiky)
         {
             spiky_comportamiento();
+        }
+        else if(tipoEnemigo == TipoEnemigo.ball)
+        {
+            ball_comportamiento();
         }
         else if (tipoEnemigo == TipoEnemigo.crusher)
         {
@@ -147,8 +159,41 @@ public class Enemigo : MonoBehaviour
             if(contadorBee > 3)
                 activarBee= true;
         }
-    }
 
+        else if ( tipoEnemigo == TipoEnemigo.bombbeen)
+        {
+           
+            bombeen_comportamiento();
+            
+            Vector3 curva = new Vector3 (-0.1f,-1,0);
+            if(bombbeenRetirada && i <4)
+            {
+                                
+                if(bombbeenTiempo <=2)
+                {
+                    float tiempoSimple = Mathf.Round(bombbeenTiempo * 10) *0.1f;
+                    Debug.Log("Tiempo " + tiempoSimple + " " + 0.6f*i + " iguales? " + Mathf.Approximately(tiempoSimple, 0.6f*i));
+                    if (Mathf.Approximately(tiempoSimple, 0.6f*i))
+                    {
+                         i++;
+                         mina=  Instantiate(bombbeenMina);
+                        mina.position = transform.GetChild(1).transform.position;        
+                       
+                    }
+                   
+                }
+                bombbeenTiempo += Time.deltaTime;                
+            }
+            else 
+                vectorMov.x = - velocidadMov;
+
+            if( mina)
+             moverObjeto(mina,curva);
+        }
+    }
+    private  Transform mina = null;
+    private int i = 1;
+    private float bombbeenTiempo = 0;
     void spiky_comportamiento() // debe dañar hasta que explota faltaria eso...
     {
         
@@ -184,6 +229,27 @@ public class Enemigo : MonoBehaviour
          if(!bienMuerto)  
             Movimiento(vectorMov); //Spiky tambien se mueve en una rampa a ver como la hago sin RigidBody :P, bueno lo logré maso :P*/
             
+    }
+
+    void ball_comportamiento()
+    {
+        bool atacar = false;
+        float sentido = -1;
+        if (derecha)
+            sentido = 1;
+     
+        Quaternion rot; 
+        if (derecha)
+           rot = Quaternion.Euler(0, 90, 0);
+        else 
+           rot = Quaternion.Euler(0, -90, 0);
+
+         vectorMov.x = sentido * velocidadMov;
+
+        transform.rotation = Quaternion.Lerp(transform.rotation, rot, Time.deltaTime * 2.0f);
+
+        animator.SetTrigger("Pararse"); //solo una vez pero hmm luego veo como evitar que se llame seguido
+        Movimiento(vectorMov);
     }
 
     void gunVolt_comportamiento()
@@ -336,9 +402,7 @@ public class Enemigo : MonoBehaviour
        }
       
 
-        transform.rotation = Quaternion.Lerp(transform.rotation, rot, Time.deltaTime * 20f);
-
-       
+        transform.rotation = Quaternion.Lerp(transform.rotation, rot, Time.deltaTime * 20f);       
         Movimiento(vectorMov);
     }
 
@@ -452,15 +516,12 @@ public class Enemigo : MonoBehaviour
                         crusherTarget.gameObject.SetActive(false);
                      }
 
-
-                                  
                      crusherSubiendo = true;
-
                 }
             }
-           
-            
+                       
        }
+
        else //subiendo
        {
             crusherTarget.parent.GetChild(1+x).tag="Untagged";
@@ -548,6 +609,78 @@ public class Enemigo : MonoBehaviour
       yield return null; 
    }
 
+   
+   void bombeen_comportamiento()
+   {
+        col.enabled = true;
+        
+        if( !bombbeenRetirada)
+         vectorMov.x = -velocidadMov;
+       
+        float distanciaX = transform.position.x - megaman.position.x;
+        
+        if( megaman.position.x > transform.position.x + 2f) //comparar posiciones es mejor que usar rayCast para detectar megaman, seria bueno usarlo en otros enemigos
+        {
+            bombbeenRetirada  = true;
+            vectorMov.x = 0;
+            vectorMov.y = velocidadMov;
+            if( transform.position.y >= 8)
+                Damage(100);
+
+        }
+
+        
+        if (!bombbeenRetirada  && distanciaX > 7.0f ) //detectar megaman
+        {
+            col.enabled = false;
+            vectorMov.x = 0;
+        }
+
+
+        if(!bombbeenRetirada  && distanciaX <= 2f)
+        {
+           bombbeenRetirada  = true;
+           vectorMov.x = 0;
+           //StartCoroutine("EsperarBombbeen");
+            
+
+        }
+
+        
+        Movimiento(vectorMov);
+   }
+
+   IEnumerator EsperarBombbeen()
+   {
+         vectorMov.x = 0;
+         /*
+         Vector3 curva = new Vector3 (-0.1f,-1,0);
+         Transform mina =  Instantiate(bombbeenMina);
+         mina.position = transform.GetChild(1).transform.position;        
+         moverObjeto(mina,curva);
+         yield return new WaitForSeconds(0.6f);
+           
+         mina =  Instantiate(bombbeenMina);
+         mina.position = transform.GetChild(1).transform.position;        
+         moverObjeto(mina,curva); 
+         yield return new WaitForSeconds(0.6f);
+       
+         mina =  Instantiate(bombbeenMina);
+         mina.position = transform.GetChild(1).transform.position;        
+         moverObjeto(mina,curva);
+         yield return new WaitForSeconds(0.6f);*/
+       
+         yield return new WaitForSeconds(3);
+         vectorMov.x = -velocidadMov;
+         yield return null;
+   }
+
+   void moverObjeto(Transform objeto, Vector3 vMov)
+   {
+        objeto.position += vMov * Time.deltaTime; 
+        //falta su groundCheck
+   }
+
     void Movimiento(Vector3 vectorMov) 
     {
         transform.position += vectorMov * Time.deltaTime;                
@@ -555,9 +688,7 @@ public class Enemigo : MonoBehaviour
 
     void Rotar()
     {
-        derecha = !derecha;
-
-        //que rote pue
+        derecha = !derecha;       
     }
 
     private float groundTolerance =0.1f;
@@ -626,6 +757,11 @@ public class Enemigo : MonoBehaviour
             explotaScript.Explota();
         }
 
+        else if (tipoEnemigo == TipoEnemigo.ball)
+        {
+            explotaScript.Explota();
+        }
+
         else if(tipoEnemigo == TipoEnemigo.crusher)
         {
             explotaScript.Explota(); //la maza no se destruye, el cuerpo explota y la maza debería caer al infinito o explotar al contacto del suelo
@@ -633,16 +769,38 @@ public class Enemigo : MonoBehaviour
 
         else if(tipoEnemigo == TipoEnemigo.bee)
         {
+            bool segundoRound = false;
+
+            if( transform.parent.parent.name == "EnemigosPlat05" )
+            {
+                segundoRound = true;
+                sueloAbeja = GameObject.Find("PisoAbejaDerrumbeB").transform;
+            }
+                       
             abejaDirector.Stop();
-            transform.position = new Vector3 (0,-30,0);
+            transform.parent.SetParent(GameObject.Find("EnemigosPlat05").transform);
+            transform.parent.transform.localPosition = Vector3.zero;
+            transform.parent.GetChild(0).gameObject.SetActive(false);
+            transform.position += new Vector3( 0,20,0);
+            col.enabled = true;            
+
+            if(!segundoRound)
+                IniBee();
+
+
             //Piso caerse
             sueloAbeja.GetComponent<Rigidbody>().isKinematic = false;
             sueloAbeja.GetComponent<Rigidbody>().useGravity = true;
             //camara resucita
             camara.GetComponent<CameraMove>().setCamaraQuieta(false); 
             //Activar Abeja Destruida
+        } 
 
-        }                  
+        else if (tipoEnemigo == TipoEnemigo.bombbeen)
+        {
+            explotaScript.Explota();
+            vectorMov = Vector3.zero; // ayuda?
+        }                 
            
         
     }
@@ -694,7 +852,7 @@ public class Enemigo : MonoBehaviour
         ataqueCol = 1;
         ataqueA = 0;
         ataqueB = 0;
-        velocidadMov =1;
+        velocidadMov =0.5f;
     }
 
     void IniGunVolt()
