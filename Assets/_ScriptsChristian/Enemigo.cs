@@ -168,13 +168,14 @@ public class Enemigo : MonoBehaviour
            
             if(bombbeenRetirada && i <4)
             {
-                                
+                 animator.SetLayerWeight(1, 1);                
                 if(bombbeenTiempo <=2)
                 {
                     float tiempoSimple = Mathf.Round(bombbeenTiempo * 10) *0.1f;
                     Debug.Log("Tiempo " + tiempoSimple + " " + 0.6f*i + " iguales? " + Mathf.Approximately(tiempoSimple, 0.6f*i));
                     if (Mathf.Approximately(tiempoSimple, 0.6f*i))
                     {
+
                         minas.Add ( Instantiate(bombbeenMina));
                         minas[i-1].position = transform.GetChild(1).transform.position; 
                         minas[i-1].GetComponent<Rigidbody>().AddForce(-1.0f-i, 0, 0, ForceMode.Impulse);                    
@@ -184,8 +185,18 @@ public class Enemigo : MonoBehaviour
                 }
                 bombbeenTiempo += Time.deltaTime;                
             }
-            else 
+            else
+            {
                 vectorMov.x = - velocidadMov;
+                 animator.SetLayerWeight(1, 0); 
+            } 
+                
+        }
+
+        else if ( tipoEnemigo == TipoEnemigo.jamminger)
+        {
+            if(puntosDeVida > 0) //deberia hacer este check con todos?
+                jamminger_comportamiento();
         }
     }
 
@@ -674,6 +685,16 @@ public class Enemigo : MonoBehaviour
    }
 
 
+   void jamminger_comportamiento()
+   {  
+        float distancia =  Vector3.Distance(transform.position,megaman.position);
+                   
+        if( distancia < 7)     
+            transform.position =  Vector3.SmoothDamp(transform.position, megaman.position + new Vector3(1,1.2f,0) ,ref velocity, 0.5f);
+
+       //Movimiento(vectorMov);
+      
+   }
 
     void Movimiento(Vector3 vectorMov) 
     {
@@ -791,6 +812,12 @@ public class Enemigo : MonoBehaviour
         } 
 
         else if (tipoEnemigo == TipoEnemigo.bombbeen)
+        {
+            explotaScript.Explota();
+            vectorMov = Vector3.zero; // ayuda?
+        }   
+
+         else if (tipoEnemigo == TipoEnemigo.jamminger)
         {
             explotaScript.Explota();
             vectorMov = Vector3.zero; // ayuda?
