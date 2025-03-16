@@ -15,6 +15,7 @@ TagManager:
   - Proyectil
   - Limite
   - PisoOcupado
+  - Mina
   layers:
   - Default
   - TransparentFX

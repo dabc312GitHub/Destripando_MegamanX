@@ -165,7 +165,7 @@ public class Enemigo : MonoBehaviour
            
             bombeen_comportamiento();
             
-            Vector3 curva = new Vector3 (-0.1f,-1,0);
+           
             if(bombbeenRetirada && i <4)
             {
                                 
@@ -175,10 +175,10 @@ public class Enemigo : MonoBehaviour
                     Debug.Log("Tiempo " + tiempoSimple + " " + 0.6f*i + " iguales? " + Mathf.Approximately(tiempoSimple, 0.6f*i));
                     if (Mathf.Approximately(tiempoSimple, 0.6f*i))
                     {
-                         i++;
-                         mina=  Instantiate(bombbeenMina);
-                        mina.position = transform.GetChild(1).transform.position;        
-                       
+                        minas.Add ( Instantiate(bombbeenMina));
+                        minas[i-1].position = transform.GetChild(1).transform.position; 
+                        minas[i-1].GetComponent<Rigidbody>().AddForce(-1.0f-i, 0, 0, ForceMode.Impulse);                    
+                        i++; 
                     }
                    
                 }
@@ -186,12 +186,10 @@ public class Enemigo : MonoBehaviour
             }
             else 
                 vectorMov.x = - velocidadMov;
-
-            if( mina)
-             moverObjeto(mina,curva);
         }
     }
-    private  Transform mina = null;
+
+    private  List<Transform> minas = new List<Transform>() ;
     private int i = 1;
     private float bombbeenTiempo = 0;
     void spiky_comportamiento() // debe dañar hasta que explota faltaria eso...
@@ -675,11 +673,7 @@ public class Enemigo : MonoBehaviour
          yield return null;
    }
 
-   void moverObjeto(Transform objeto, Vector3 vMov)
-   {
-        objeto.position += vMov * Time.deltaTime; 
-        //falta su groundCheck
-   }
+
 
     void Movimiento(Vector3 vectorMov) 
     {

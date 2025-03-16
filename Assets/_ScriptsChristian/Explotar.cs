@@ -52,6 +52,18 @@ public class Explotar : MonoBehaviour
 
    }
 
+   void ImpactoMega(Collider Col)
+   {
+
+        Col.transform.parent.GetComponent<Animator>().SetTrigger("Damage"); //Impacto se llama en anim
+        invulnerable = true;
+        ImpactoScript.getExtension().enabled = false;   
+        matA.SetFloat("_Invulnerable",1.0f);
+        matB.SetFloat("_Invulnerable",1.0f);
+        StartCoroutine("Invulnerable");
+        //Col.transform.parent.GetComponent<Animator>().SetBool("Damage", false); 
+   }
+
 
    void OnTriggerEnter(Collider Col) 
    {
@@ -60,27 +72,28 @@ public class Explotar : MonoBehaviour
         {
             if(!invulnerable)
             {
-                Enemigo enemigoScript = transform.GetComponent<Enemigo>();
-                if( enemigoScript)
-                    Col.transform.parent.GetComponent<Impacto>().Damage(enemigoScript.getAtaqueCol()); //daño por chocar enemigos //puede que a veces choque con characterController?
+               if(this.tag != "Mina")
+               {
+                    Enemigo enemigoScript = transform.GetComponent<Enemigo>();
+                    if( enemigoScript)
+                        Col.transform.parent.GetComponent<Impacto>().Damage(enemigoScript.getAtaqueCol()); //daño por chocar enemigos //puede que a veces choque con characterController?
 
-                if( gameObject.CompareTag("Proyectil")) //plasma se comporta como proyectil pero no explota, ver eso luego
-                {
-                    Explota();// solo explota si es proyectil
-                     Col.transform.parent.GetComponent<Impacto>().Damage(2f); // todos hacen daño 2? //Plasma necesita su tag
-                    // y desparece
-                }
-                else
-                     Col.transform.parent.GetComponent<Impacto>().Damage(1f); // plasma y disparo de bee y otros?
+                    if( gameObject.CompareTag("Proyectil")) //plasma se comporta como proyectil pero no explota, ver eso luego
+                    {
+                        Explota();// solo explota si es proyectil
+                         Col.transform.parent.GetComponent<Impacto>().Damage(2f); // todos hacen daño 2? //Plasma necesita su tag
+                        // y desparece
+                    }
 
-                Col.transform.parent.GetComponent<Animator>().SetTrigger("Damage"); //Impacto se llama en anim
+                  ImpactoMega(Col);
+                   Col.transform.parent.GetComponent<Impacto>().Damage(1f); // plasma y disparo de bee y otros?
 
-                invulnerable = true;
-                ImpactoScript.getExtension().enabled = false;   
-                matA.SetFloat("_Invulnerable",1.0f);
-                matB.SetFloat("_Invulnerable",1.0f);
-                StartCoroutine("Invulnerable");
-                //Col.transform.parent.GetComponent<Animator>().SetBool("Damage", false); 
+               }
+
+                else 
+                  StartCoroutine("ExplotaTiempo",Col);
+                    
+                
             }        
             
         }
@@ -90,6 +103,15 @@ public class Explotar : MonoBehaviour
         }            
                 
    }
+
+   public IEnumerator ExplotaTiempo(Collider col)
+   {
+         yield return new WaitForSeconds(3f);
+         Explota();
+         ImpactoMega(col);
+         yield return null;
+   }
+   
 
 
    public IEnumerator Invulnerable()

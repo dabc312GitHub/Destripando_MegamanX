@@ -139,7 +139,7 @@ MonoBehaviour:
   id: 5
   salidaMisiles: {fileID: 0}
   misil: {fileID: 0}
-  bombbeenMina: {fileID: 7988484972074516738, guid: df67286ad20faa943ac3766091171d88, type: 3}
+  bombbeenMina: {fileID: 3082921919860403339, guid: c72411b541ddc25419a43d7688a64a28, type: 3}
 --- !u!114 &7807915471591000496
 MonoBehaviour:
   m_ObjectHideFlags: 0
