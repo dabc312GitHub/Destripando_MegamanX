@@ -36,8 +36,17 @@ public class Enemigo : MonoBehaviour
     private bool cicloCrusher = false;
     private bool CrusherMirar = false;
 
-    private bool bombbeenRetirada = false;
     [SerializeField] private Transform bombbeenMina;
+    private bool bombbeenRetirada = false;    
+    private  List<Transform> minas = new List<Transform>() ;
+    private int i = 1;
+    private float bombbeenTiempo = 0;
+    
+
+    private float contadorBee = 0;
+    private bool activarBee = false;
+
+    private bool roadAtInicio = false;
 
     private Transform megaman;
 
@@ -127,7 +136,8 @@ public class Enemigo : MonoBehaviour
                 efectoDamage = false;
             }
         }
-       
+
+
         
         if(tipoEnemigo == TipoEnemigo.spiky)
         {
@@ -172,7 +182,7 @@ public class Enemigo : MonoBehaviour
                 if(bombbeenTiempo <=2)
                 {
                     float tiempoSimple = Mathf.Round(bombbeenTiempo * 10) *0.1f;
-                    Debug.Log("Tiempo " + tiempoSimple + " " + 0.6f*i + " iguales? " + Mathf.Approximately(tiempoSimple, 0.6f*i));
+                    
                     if (Mathf.Approximately(tiempoSimple, 0.6f*i))
                     {
 
@@ -198,11 +208,20 @@ public class Enemigo : MonoBehaviour
             if(puntosDeVida > 0) //deberia hacer este check con todos?
                 jamminger_comportamiento();
         }
+
+        else if ( tipoEnemigo == TipoEnemigo.roadAt)
+        {
+             
+            float distancia =  Vector3.Distance(transform.position,megaman.position);
+            if( distancia < 8)
+                roadAtInicio = true;
+
+            if(roadAtInicio)
+            roadAt_comportamiento();
+        }
     }
 
-    private  List<Transform> minas = new List<Transform>() ;
-    private int i = 1;
-    private float bombbeenTiempo = 0;
+
     void spiky_comportamiento() // debe dañar hasta que explota faltaria eso...
     {
         
@@ -342,13 +361,13 @@ public class Enemigo : MonoBehaviour
             layerMask
         );
        
-        Debug.DrawRay(origen , new Vector3(-1,0,0) * distancia, Color.yellow);
+        //Debug.DrawRay(origen , new Vector3(-1,0,0) * distancia, Color.yellow);
         if (megaman)
         {
 
              if( hit.transform.gameObject.CompareTag("Player"))
              {
-                Debug.Log(hit.transform.gameObject);
+                //Debug.Log(hit.transform.gameObject);
                 return true;
              }
              return false;
@@ -556,8 +575,7 @@ public class Enemigo : MonoBehaviour
         yield return null;
     }
 
-    private float contadorBee = 0;
-    private bool activarBee = false;
+
     void bee_comportamiento()
     {
         Vector3 origenA = salidaMisiles.position;       
@@ -696,6 +714,82 @@ public class Enemigo : MonoBehaviour
       
    }
 
+ 
+
+
+   void roadAt_comportamiento()
+   {
+
+        RaycastHit hit;
+        bool suelo = Physics.Raycast(
+            transform.position, 
+            Vector3.down,
+            out hit,
+            0.1f
+        );
+
+
+        int orientacion = -1;        
+        vectorMov.y = 0;
+
+        Quaternion rot = transform.rotation;
+        
+
+        int overdrive = 5;
+        
+        if(!suelo)
+        {
+                
+           vectorMov.y = -velocidadMov;
+           Movimiento(vectorMov); 
+        }
+
+        else
+        {
+             if( hit.collider.tag == "ZonaMuerte")
+            {
+                vectorMov.y = -velocidadMov;
+                Movimiento(vectorMov);
+            }
+
+            float x = transform.position.x;
+           
+
+            if(Quaternion.Dot(transform.rotation,Quaternion.Euler(0, -90, 0) ) > 0.1f  ) //transform.rotation == Quaternion.Euler(0, -90, 0))
+                 x = Mathf.MoveTowards( x, megaman.position.x - overdrive , Time.deltaTime * velocidadMov);
+
+           
+            if( Quaternion.Dot(transform.rotation,Quaternion.Euler(0, 90, 0)) > 0.1f )//transform.rotation ==  Quaternion.Euler(0, 90, 0) ) 
+                x = Mathf.MoveTowards(x, megaman.position.x + overdrive , Time.deltaTime * velocidadMov);
+                         
+            transform.position = new Vector3 (x,transform.position.y,transform.position.z) ;
+
+        }
+
+       
+       
+
+      float simpleIzq = Mathf.Round((megaman.position.x - overdrive) *10 ) * 0.1f;
+      float simpleDer = Mathf.Round((megaman.position.x + overdrive) *10 ) * 0.1f;
+      float simplePos = Mathf.Round(transform.position.x  *10 ) * 0.1f;
+  
+       
+        if( Mathf.Approximately( simpleIzq , simplePos ) )
+        {            
+            rot = Quaternion.Euler(0, 90, 0);
+        }
+
+        else if( Mathf.Approximately( simpleDer , simplePos ) )
+        {
+             rot = Quaternion.Euler(0, -90, 0);
+        } 
+       
+        transform.rotation = Quaternion.Lerp(transform.rotation, rot, Time.deltaTime * 20f);
+        //transform.rotation = rot; // si aparencen errores que sea giro brusco, menos vistoso pero menos errores ( si hubiera)
+
+   }
+
+
     void Movimiento(Vector3 vectorMov) 
     {
         transform.position += vectorMov * Time.deltaTime;                
@@ -821,7 +915,14 @@ public class Enemigo : MonoBehaviour
         {
             explotaScript.Explota();
             vectorMov = Vector3.zero; // ayuda?
-        }                 
+        }  
+
+        else if (tipoEnemigo == TipoEnemigo.roadAt)
+        {
+            explotaScript.Explota();
+            vectorMov = Vector3.zero; // este si se mueve muertito
+            //efectitos y que salga el destruido?
+        }              
            
         
     }
