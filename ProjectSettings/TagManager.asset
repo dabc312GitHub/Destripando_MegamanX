@@ -16,6 +16,7 @@ TagManager:
   - Limite
   - PisoOcupado
   - Mina
+  - Plasma
   layers:
   - Default
   - TransparentFX

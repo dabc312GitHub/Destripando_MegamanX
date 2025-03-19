@@ -78,29 +78,37 @@ public class Explotar : MonoBehaviour
                     if( enemigoScript)
                         Col.transform.parent.GetComponent<Impacto>().Damage(enemigoScript.getAtaqueCol()); //daño por chocar enemigos //puede que a veces choque con characterController?
 
-                    if( gameObject.CompareTag("Proyectil")) //plasma se comporta como proyectil pero no explota, ver eso luego
+                    else if( gameObject.CompareTag("Proyectil") ) 
                     {
                         Explota();// solo explota si es proyectil
-                         Col.transform.parent.GetComponent<Impacto>().Damage(2f); // todos hacen daño 2? //Plasma necesita su tag
-                        // y desparece
+                         Col.transform.parent.GetComponent<Impacto>().Damage(2f); // todos hacen daño 2?                         
                     }
+                    
+                    else if( gameObject.CompareTag("Plasma") ) //plasma se comporta como proyectil pero no explota
+                    {
+                         this.transform.position = posEnemigos; //solo moverlo, si muere en antibalas interrumpe script y causa bug 
+                        Col.transform.parent.GetComponent<Impacto>().Damage(2f); // todos hacen daño 2? 
+                    }
+                         
 
-                  ImpactoMega(Col);
-                   Col.transform.parent.GetComponent<Impacto>().Damage(1f); // plasma y disparo de bee y otros?
+                    else
+                        Col.transform.parent.GetComponent<Impacto>().Damage(1f); //  disparo de bee y otros?
+                   
+                   ImpactoMega(Col);
 
                }
 
                 else 
                   StartCoroutine("ExplotaTiempo",Col);
-                    
-                
+              
             }        
             
         }
+        /* Que muera en Antibalas
         else if(gameObject.tag == "Proyectil") // si choco pared sinedo proyectil 
         {
             Explota();
-        }            
+        } */           
                 
    }
 
@@ -144,11 +152,11 @@ public class Explotar : MonoBehaviour
 
    IEnumerator MoverExplosion(int i)
    {
-        this.transform.position = posEnemigos;
+        this.transform.position = posEnemigos; //no lo puedo matar arruina el resto del codigo, guardarlo en una lista y matarlos luego?
         yield return new WaitForSeconds(2);
         poolExplosion[i].transform.position = posPool;
         poolExplosion[i].gameObject.SetActive(false);
-        indice ++;
+        indice ++;        
         yield return null;
    }
 }

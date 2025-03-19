@@ -22,65 +22,47 @@ public class AnimEvents : MonoBehaviour
       return salidasPos;
    }
 
-  
+  /*
    void Explota()
    {
         Transform exp =  Instantiate(explosion);
         
         // al cabo de un rato delete la instancia y el enemigo?
-   }
+   }*/
 
-   public void GunVoltAttackA() // qe reciba parametro segun lo que los raycast digan atacar donde detecte?, tambien se usa en bee, ayayay este código (yo soy artista)
+   public void GunVoltAttackA() // ayayay este código (yo soy artista)
    {
 
         Transform proyectil;
 
         int index = (int) Random.Range(0, 5); //salidas.Count -1);
        
-        bool explota = false;
-
         if(index == 4 )
              proyectil =  Instantiate(gunVoltEnergia);
         else
-        {
-            explota = true;
-            proyectil =  Instantiate(gunVoltProyectil);
-        }
-          
-
+           proyectil =  Instantiate(gunVoltProyectil);
+        
         proyectil.position = salidas[index].position;
 
-
-       // moverAtaque(proyectil,explota);
-        StartCoroutine(moverAtaque(proyectil, explota));
+        StartCoroutine(moverAtaque(proyectil));
 
    }
 
-   IEnumerator moverAtaque(Transform attack, bool explota) //necesito ese bool?
+   IEnumerator moverAtaque(Transform attack) 
    {
       float tiempo = 5.0f;
       while (tiempo > 0)
       {
-         attack.position += Vector3.left * Time.deltaTime * velocidadProyectiles; 
+         if(attack) //por si muere en antibalas
+            attack.position += Vector3.left * Time.deltaTime * velocidadProyectiles; 
          tiempo -=Time.deltaTime;
          yield return null;
       }
       yield return null; 
    }
 
-/*
-   void moverAtaque(Transform attack, bool explota)
-   {
 
-   }*/
    
 }
 
 
-/*
-   StartCoroutine(CoroutineWithMultipleParameters(1.0F, 2.0F, "foo"));
-  }
-  IEnumerator CoroutineWithMultipleParameters(float aNum, float bNum, string aWord){
-     //stuff
-
-     */

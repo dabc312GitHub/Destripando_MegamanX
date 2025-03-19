@@ -54,7 +54,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: bf4fbcbc8ea72994ba2647862a75fb6d, type: 3}
       propertyPath: m_TagString
-      value: En_Spiky
+      value: Untagged
       objectReference: {fileID: 0}
     - target: {fileID: 4292058967349894802, guid: bf4fbcbc8ea72994ba2647862a75fb6d, type: 3}
       propertyPath: m_RenderingLayerMask
@@ -114,6 +114,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   explosion: {fileID: 4701659688279944157, guid: ebdf0fcf4734db642a42aba268baed86, type: 3}
+  explosionesMax: 5
 --- !u!65 &8928283152776205759
 BoxCollider:
   m_ObjectHideFlags: 0

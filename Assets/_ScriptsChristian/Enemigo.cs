@@ -46,7 +46,7 @@ public class Enemigo : MonoBehaviour
     private float contadorBee = 0;
     private bool activarBee = false;
 
-    private bool roadAtInicio = false;
+    private bool ataqueInicio = false;
 
     private Transform megaman;
 
@@ -137,10 +137,15 @@ public class Enemigo : MonoBehaviour
             }
         }
 
+        float distancia =  Vector3.Distance(transform.position,megaman.position);
 
         
         if(tipoEnemigo == TipoEnemigo.spiky)
         {
+             if( distancia < 8)
+                ataqueInicio = true;
+
+            if(ataqueInicio)
             spiky_comportamiento();
         }
         else if(tipoEnemigo == TipoEnemigo.ball)
@@ -212,17 +217,17 @@ public class Enemigo : MonoBehaviour
         else if ( tipoEnemigo == TipoEnemigo.roadAt)
         {
              
-            float distancia =  Vector3.Distance(transform.position,megaman.position);
+            
             if( distancia < 8)
-                roadAtInicio = true;
+                ataqueInicio = true;
 
-            if(roadAtInicio)
+            if(ataqueInicio)
             roadAt_comportamiento();
         }
     }
 
 
-    void spiky_comportamiento() // debe dañar hasta que explota faltaria eso...
+    void spiky_comportamiento() 
     {
         
         if( !bienMuerto && puntosDeVida==0 && vectorMov.x > -0.05f ) //recien quieto, puntos de vida 0 porque al inicio vectorx es zero
@@ -680,23 +685,7 @@ public class Enemigo : MonoBehaviour
    IEnumerator EsperarBombbeen()
    {
          vectorMov.x = 0;
-         /*
-         Vector3 curva = new Vector3 (-0.1f,-1,0);
-         Transform mina =  Instantiate(bombbeenMina);
-         mina.position = transform.GetChild(1).transform.position;        
-         moverObjeto(mina,curva);
-         yield return new WaitForSeconds(0.6f);
-           
-         mina =  Instantiate(bombbeenMina);
-         mina.position = transform.GetChild(1).transform.position;        
-         moverObjeto(mina,curva); 
-         yield return new WaitForSeconds(0.6f);
-       
-         mina =  Instantiate(bombbeenMina);
-         mina.position = transform.GetChild(1).transform.position;        
-         moverObjeto(mina,curva);
-         yield return new WaitForSeconds(0.6f);*/
-       
+        
          yield return new WaitForSeconds(3);
          vectorMov.x = -velocidadMov;
          yield return null;
@@ -715,7 +704,6 @@ public class Enemigo : MonoBehaviour
    }
 
  
-
 
    void roadAt_comportamiento()
    {
@@ -857,6 +845,7 @@ public class Enemigo : MonoBehaviour
 
         if( tipoEnemigo == TipoEnemigo.spiky)
         {
+            col.enabled = true; // daña hasta que explota
             animator.SetTrigger("Muerte");           
         }
 
@@ -1036,13 +1025,7 @@ public class Enemigo : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        /*
-        if(other.gameObject.CompareTag("ZonaMuerte")) // no funca
-        {
-            Destroy(this);
-        }*/
-
-
+        
         if(other.gameObject.CompareTag("MegamanAtaqueA")) //basico
         {
             Damage(1); // si balas basicas chocan deberian desparecer, las fuerets si traspasan?
@@ -1050,16 +1033,21 @@ public class Enemigo : MonoBehaviour
         }
         else if(other.gameObject.CompareTag("MegamanAtaqueB")) //medio
         {
-             Damage(2); //deberian desaparecer al cabo de un tiempo..., tal vez pared invisible pegado a megaman
+             Damage(2); //mueren en Antibalas
         }
         else if(other.gameObject.CompareTag("MegamanAtaqueC"))//alto
         {
-            Damage(4);
+            Damage(4); //mueren en Antibalas
         }
 
         if(other.gameObject.CompareTag("Limite"))
         {
             Rotar();
+        }
+
+         if(other.gameObject.CompareTag("ZonaMuerte"))
+        {
+            Destroy(this.gameObject);
         }
     }
 
