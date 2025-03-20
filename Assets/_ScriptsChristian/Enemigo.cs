@@ -46,6 +46,11 @@ public class Enemigo : MonoBehaviour
     private float contadorBee = 0;
     private bool activarBee = false;
 
+    [SerializeField] private Transform balaRoadAt;    
+    private Transform roadAtFiringPos;   
+    private float contadorRoad = 0;
+
+
     private bool ataqueInicio = false;
 
     private Transform megaman;
@@ -217,14 +222,33 @@ public class Enemigo : MonoBehaviour
         else if ( tipoEnemigo == TipoEnemigo.roadAt)
         {
              
-            
-            if( distancia < 8)
+            if(ataqueInicio == false && distancia < 8)
                 ataqueInicio = true;
 
             if(ataqueInicio)
-            roadAt_comportamiento();
+            {
+                roadAt_comportamiento();
+
+                if(contadorRoad > 2)
+                {
+                    roadAtAtaque();
+                    contadorRoad = 0;
+                }
+                contadorRoad += Time.deltaTime;
+            }
+           
         }
     }
+
+
+    void FixedUpdate()
+    {   
+            // Condicional para los que usan esto?
+         GroundedCheck();
+        if(!isWallCollided) // solo una vez?
+            WallCheck();
+
+    } 
 
 
     void spiky_comportamiento() 
@@ -345,12 +369,7 @@ public class Enemigo : MonoBehaviour
     }
 
 
-    void FixedUpdate()
-    {
-        GroundedCheck();
-        if(!isWallCollided) // solo una vez?
-            WallCheck();
-    } 
+
 
     bool crusher_preComportamiento() //megaman a la vista
     {
@@ -632,12 +651,13 @@ public class Enemigo : MonoBehaviour
       float tiempo = 5.0f;
       while (tiempo > 0)
       {
-         attack.position += Vector3.left * Time.deltaTime * 3.0f; 
+        if(attack)
+            attack.position += Vector3.left * Time.deltaTime * 3.0f; 
          tiempo -=Time.deltaTime;
          //Destroy(attack.gameObject);
          yield return null;
       }
-      attack.position = new Vector3(0,-20,0);
+      //attack.position = new Vector3(0,-20,0); no es necesario, el antibalas lo maneja?, si lo descomentas null exception
       yield return null; 
    }
 
@@ -699,7 +719,7 @@ public class Enemigo : MonoBehaviour
         if( distancia < 7)     
             transform.position =  Vector3.SmoothDamp(transform.position, megaman.position + new Vector3(1,1.2f,0) ,ref velocity, 0.5f);
 
-       //Movimiento(vectorMov);
+       //Movimiento(vectorMov); // falta un ataque, se acerca y se retira rapido un poco hacia arriba, si megaman se mueve retoma comportamiento norma?
       
    }
 
@@ -734,14 +754,16 @@ public class Enemigo : MonoBehaviour
 
         else
         {
-             if( hit.collider.tag == "ZonaMuerte")
+            
+             if( hit.collider.tag == "ZonaMuerte") //se destruye ya no necesario?
             {
                 vectorMov.y = -velocidadMov;
                 Movimiento(vectorMov);
             }
 
+            //roadAtAtaque();
+
             float x = transform.position.x;
-           
 
             if(Quaternion.Dot(transform.rotation,Quaternion.Euler(0, -90, 0) ) > 0.1f  ) //transform.rotation == Quaternion.Euler(0, -90, 0))
                  x = Mathf.MoveTowards( x, megaman.position.x - overdrive , Time.deltaTime * velocidadMov);
@@ -755,8 +777,6 @@ public class Enemigo : MonoBehaviour
         }
 
        
-       
-
       float simpleIzq = Mathf.Round((megaman.position.x - overdrive) *10 ) * 0.1f;
       float simpleDer = Mathf.Round((megaman.position.x + overdrive) *10 ) * 0.1f;
       float simplePos = Mathf.Round(transform.position.x  *10 ) * 0.1f;
@@ -772,9 +792,21 @@ public class Enemigo : MonoBehaviour
              rot = Quaternion.Euler(0, -90, 0);
         } 
        
-        transform.rotation = Quaternion.Lerp(transform.rotation, rot, Time.deltaTime * 20f);
-        //transform.rotation = rot; // si aparencen errores que sea giro brusco, menos vistoso pero menos errores ( si hubiera)
+        //transform.rotation = Quaternion.Lerp(transform.rotation, rot, Time.deltaTime * 20f);
+        transform.rotation = rot; // si aparencen errores que sea giro brusco, menos vistoso pero menos errores ( si hubiera)
 
+   }
+
+
+
+   void roadAtAtaque() 
+   {
+        Vector3 pos = roadAtFiringPos.position;
+     
+        Transform bala = Instantiate(balaRoadAt);
+        bala.position = pos;
+        Debug.Log(" " + transform.right);
+        bala.GetComponent<Rigidbody>().linearVelocity = new Vector3(-transform.right.z * 6,0,0);
    }
 
 
@@ -1009,6 +1041,8 @@ public class Enemigo : MonoBehaviour
         ataqueA = 1; 
         ataqueB = 0;
         velocidadMov = 3;
+
+        roadAtFiringPos = transform.GetChild(4);
     }
 
     void IniOtro()

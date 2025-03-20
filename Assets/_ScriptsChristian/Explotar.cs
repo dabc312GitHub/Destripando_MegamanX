@@ -54,8 +54,10 @@ public class Explotar : MonoBehaviour
 
    void ImpactoMega(Collider Col)
    {
-
-        Col.transform.parent.GetComponent<Animator>().SetTrigger("Damage"); //Impacto se llama en anim
+        if(Col.transform.parent)
+            Col.transform.parent.GetComponent<Animator>().SetTrigger("Damage"); //Impacto se llama en anim
+        else
+            Col.transform.GetComponent<Animator>().SetTrigger("Damage"); // si es el characterController???
         invulnerable = true;
         ImpactoScript.getExtension().enabled = false;   
         matA.SetFloat("_Invulnerable",1.0f);
@@ -76,7 +78,10 @@ public class Explotar : MonoBehaviour
                {
                     Enemigo enemigoScript = transform.GetComponent<Enemigo>();
                     if( enemigoScript)
-                        Col.transform.parent.GetComponent<Impacto>().Damage(enemigoScript.getAtaqueCol()); //daño por chocar enemigos //puede que a veces choque con characterController?
+                    {
+                        if(Col.transform.parent) // para que no toa en cuenta el Charactercontroller (si es lo que causa problemas)
+                            Col.transform.parent.GetComponent<Impacto>().Damage(enemigoScript.getAtaqueCol()); //daño por chocar enemigos //puede que a veces choque con characterController?
+                    }
 
                     else if( gameObject.CompareTag("Proyectil") ) 
                     {
@@ -99,7 +104,7 @@ public class Explotar : MonoBehaviour
                }
 
                 else 
-                  StartCoroutine("ExplotaTiempo",Col);
+                  StartCoroutine("ExplotaTiempo",Col); //minas de bombeen deberian explotar apenas tocan suelo y no apenas toquen megaan?
               
             }        
             

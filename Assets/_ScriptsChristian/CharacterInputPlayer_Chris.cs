@@ -366,66 +366,11 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 
 		GroundedCheck();
 		WallCheck();
-
-		
-
-
-/*
-		if( Input.GetKeyUp(jumpKeyboard))
-		{
-			 GetComponent<Rigidbody>().useGravity = true;
-		}*/
-
-
-
-
-		/*
-	    if (Input.GetKeyUp(jumpKeyboard))
-	    {
-	    	Debug.Log("saltando");
-		    GetComponent<Rigidbody>().useGravity = true;
-		    if (!isGrounded)
-		    {
-			    anim.SetBool("Air", true);
-		    }
-		    else
-		    {
-			    anim.SetBool("Air", false);
-		    }
-	    }
-	
-
-	    if (isGrounded && !isJumpingUp && Input.GetKeyDown(jumpKeyboard))
-	    {
-		    isJumpingUp = true;
-		    jumpAxisY = transform.localPosition.y;
-		    GetComponent<Rigidbody>().useGravity = false;
-		    anim.SetBool("IdleWalk", false); 
-		    anim.SetTrigger("Jump");
-	    }
-	    if ( !isGrounded && isJumpingUp && Input.GetKey(jumpKeyboard))
-	    {
-		    if (transform.localPosition.y <= jumpAxisY + limitJumping)
-		    {
-		    	Debug.Log("ojoo");
-			    //transform.localPosition += Vector3.up * Time.deltaTime * -Physics.gravity.y * jumpVelocity;
-			    transform.localPosition = Vector3.SmoothDamp(transform.localPosition, transform.localPosition + new Vector3(0,1.5f,0) , ref velocityV, jumpVelocity* Time.deltaTime );
-		    }
-		    else
-		    {
-			    GetComponent<Rigidbody>().useGravity = true;
-			    anim.SetBool("Air", true);
-		    }
-
-	    }*/
-		
-
 	}
 
 	
 	
-	
-    public void GroundedCheck()
+    public void GroundedCheck() // mascara para que no sale encima de balas o enemigos?
     {
     	isGrounded = Physics.Raycast(
 		    transform.position, 
@@ -456,79 +401,6 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
     	//Debug.DrawRay(centro , transform.forward * distancia, Color.yellow); 
     }
 
-/*
-    void OnControllerColliderHit (ControllerColliderHit  hit)
-    {
-    	Debug.Log("nyoron");
 
-    	Rigidbody body = hit.collider.attachedRigidbody;
-
-    	if (body == null || body.isKinematic)
-        {
-            return;
-        }
-
-    	if (hit.gameObject.CompareTag("Wall"))
-	    {
-		    isWallCollided = true;
-		    //_objectCollided = ObjectCollided.Wall;
-		    // jumpDirection = Vector3.right;
-		    print("owo");
-		    return;
-	    }
-	   
-	    
-	    return;
-    }*/
-
-/*
-    void OnCollisionEnter(Collision other)
-    {
-    	
-	    if (other.gameObject.CompareTag("Ground"))
-	    {
-		    // _objectCollided = ObjectCollided.Ground;
-		    isGroundCollided = true;
-			// anim.SetBool("Air", false);
-			// anim.SetTrigger("Ground");
-			// anim.SetBool("Jumping", false);
-            // jumpDirection = Vector3.down;
-            print("coll Ground");
-	    }
-	    else if (other.gameObject.CompareTag("Wall"))
-	    {
-		    isWallCollided = true;
-		    // _objectCollided = ObjectCollided.Wall;
-		    // jumpDirection = Vector3.right;
-		    print("coll Wall");
-	    }
-		else
-		{
-            _objectCollided = ObjectCollided.None;
-            print("None wallground");
-        }
-    }
-    */
-
-/*
-    void OnCollisionExit(Collision other)
-    {
-    	
-	    if (other.gameObject.CompareTag("Ground"))
-	    {
-		    // _objectCollided = ObjectCollided.Ground;
-		    isGroundCollided = false;
-		    // jumpDirection = Vector3.down;
-		    print("coll Ground");
-	    }
-	    else
-	    if (other.gameObject.CompareTag("Wall"))
-	    {
-		    isWallCollided = false;
-		    // _objectCollided = ObjectCollided.Wall;
-		    // jumpDirection = Vector3.right;
-		    print("coll Wall exit");
-	    }
-    }*/
 }
 
