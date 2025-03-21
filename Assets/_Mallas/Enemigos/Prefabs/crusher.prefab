@@ -129,7 +129,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 516d2cb2df6d6e14a8dbdee8f63459ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  id: 8
+  abejaDirector: {fileID: 0}
+  camara: {fileID: 0}
+  sueloAbeja: {fileID: 0}
+  id: 9
+  salidaMisiles: {fileID: 0}
+  misil: {fileID: 0}
+  bombbeenMina: {fileID: 0}
+  balaRoadAt: {fileID: 0}
+  enemigoInstancia: {fileID: 0}
 --- !u!114 &1743337181886951745
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -204,4 +212,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 516d2cb2df6d6e14a8dbdee8f63459ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  abejaDirector: {fileID: 0}
+  camara: {fileID: 0}
+  sueloAbeja: {fileID: 0}
   id: 1
+  salidaMisiles: {fileID: 0}
+  misil: {fileID: 0}
+  bombbeenMina: {fileID: 0}
+  balaRoadAt: {fileID: 0}
+  enemigoInstancia: {fileID: 0}

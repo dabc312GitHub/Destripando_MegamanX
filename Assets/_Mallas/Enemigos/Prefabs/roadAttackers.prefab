@@ -279,8 +279,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.0142226, y: 0.8622875, z: 1.9420333}
-  m_Center: {x: 4.4676414e-16, y: 0.3748745, z: 0.041904915}
+  m_Size: {x: 1.2171147, y: 0.8622875, z: 1.9420333}
+  m_Center: {x: 0.010513872, y: 0.37487447, z: 0.041904926}
 --- !u!114 &7249286698002820567
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -315,3 +315,4 @@ MonoBehaviour:
   misil: {fileID: 0}
   bombbeenMina: {fileID: 0}
   balaRoadAt: {fileID: 9076064939318164390, guid: 3b12f71e0b140894bb09913f5c8dd956, type: 3}
+  enemigoInstancia: {fileID: 0}

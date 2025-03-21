@@ -45,18 +45,9 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 
     private Vector3 velocityV = Vector3.zero;
 
-    private enum ObjectCollided
-	{
-		Shooter,
-		Ground,
-		Wall,
-		None
-	}
 
 	private bool isWallCollided = false;
 	private bool isGrounded = true;
-
-	private ObjectCollided _objectCollided;
 
 	private Material VFX_brilloCarga;
 
@@ -147,7 +138,7 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 		{
 			float speed = Mathf.Abs(inputVec.x);
 			speed = Mathf.SmoothDamp(anim.GetFloat("Speed"), speed, ref velocity, 0.1f);
-			if (isWallCollided)// (_objectCollided == ObjectCollided.Wall) //Funciona?
+			if (isWallCollided) //Funciona?
 			{			
 				//speed = Mathf.SmoothDamp(anim.GetFloat("Speed"),0, ref velocity, 0.1f);
 				speed = Mathf.Lerp(anim.GetFloat("Speed"),0,Mathf.Abs(inputVec.x)); // mejorar luego?

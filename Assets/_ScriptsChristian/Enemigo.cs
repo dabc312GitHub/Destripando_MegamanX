@@ -50,8 +50,11 @@ public class Enemigo : MonoBehaviour
     private Transform roadAtFiringPos;   
     private float contadorRoad = 0;
 
-
     private bool ataqueInicio = false;
+
+    [SerializeField] private Transform enemigoInstancia;  
+    private Transform naveOrigenAttackers;
+
 
     private Transform megaman;
 
@@ -65,7 +68,8 @@ public class Enemigo : MonoBehaviour
         bombbeen,
         jamminger,
         roadAt,
-        otro  //maza del crusher y proyectiles tal vez deberian estar aqui
+        nave,
+        otro  //masa del crusher y proyectiles tal vez deberian estar aqui
     }
 
     private TipoEnemigo tipoEnemigo;
@@ -109,8 +113,12 @@ public class Enemigo : MonoBehaviour
                 tipoEnemigo = TipoEnemigo.roadAt;
                 IniRoadAt();
                 break;
+            case 8:
+                tipoEnemigo = TipoEnemigo.nave;
+                IniNave();
+                break;
             default:
-                tipoEnemigo = TipoEnemigo.otro;
+                tipoEnemigo = TipoEnemigo.otro; //estoy usando este?
                 IniOtro();
                 break;
         }
@@ -216,7 +224,7 @@ public class Enemigo : MonoBehaviour
         else if ( tipoEnemigo == TipoEnemigo.jamminger)
         {
             if(puntosDeVida > 0) //deberia hacer este check con todos?
-                jamminger_comportamiento();
+                jamminger_comportamiento(); //comportamiento original es un poco mas complejo
         }
 
         else if ( tipoEnemigo == TipoEnemigo.roadAt)
@@ -238,6 +246,22 @@ public class Enemigo : MonoBehaviour
             }
            
         }
+        /* TIMELINE tiene la prioridad,no son simultaneas, lo ignora. Constraint funciona pero dificil empalmar posiciones del timeline
+        else if( tipoEnemigo == TipoEnemigo.nave)
+        {
+            Vector3 megamanPos = megaman.position;
+            float x = Mathf.Lerp( transform.position.x, megaman.position.x, Time.deltaTime * 10f );
+            transform.position = new Vector3( x,transform.position.y,transform.position.z);
+            //seguir a megaman ligeramente?
+
+        }*/
+    }
+
+    public void InstanceAttacker() // se llama como evento en animacion misma
+    {
+       Transform attacker = Instantiate(enemigoInstancia);
+       attacker.position = naveOrigenAttackers.position;
+  
     }
 
 
@@ -344,8 +368,7 @@ public class Enemigo : MonoBehaviour
 
         if (hit.collider!=null)
         {
-         /*   if( hit.transform.gameObject.CompareTag("Untagged") ) //solucionar Pared invisible corta el rayo, como la ignoro con mask en Raycast supongo
-                return;*/
+        
              if( hit.transform.gameObject.CompareTag("Player"))
             {
                 animator.SetBool("Attack", true);
@@ -654,7 +677,7 @@ public class Enemigo : MonoBehaviour
         if(attack)
             attack.position += Vector3.left * Time.deltaTime * 3.0f; 
          tiempo -=Time.deltaTime;
-         //Destroy(attack.gameObject);
+         
          yield return null;
       }
       //attack.position = new Vector3(0,-20,0); no es necesario, el antibalas lo maneja?, si lo descomentas null exception
@@ -727,13 +750,14 @@ public class Enemigo : MonoBehaviour
 
    void roadAt_comportamiento()
    {
-
+        LayerMask layerMask = LayerMask.GetMask("Piso", "PisoDestruible"); //mismos layer para el caso megaman (impedir saltar sobre balas y enemigos a veces)
         RaycastHit hit;
         bool suelo = Physics.Raycast(
             transform.position, 
             Vector3.down,
             out hit,
-            0.1f
+            0.1f,
+            layerMask
         );
 
 
@@ -827,10 +851,12 @@ public class Enemigo : MonoBehaviour
 
     void GroundedCheck()
     {
+       // LayerMask layerMask = LayerMask.GetMask("Piso", "PisoDestruible"); //mismos layer para el caso megaman (impedir saltar sobre balas y enemigos a veces)
         isGrounded = Physics.Raycast(
             transform.position, 
             Vector3.down,
             groundTolerance
+            //layerMask
         );
         //print("isGrounded: " + isGrounded);
        // Debug.DrawRay(transform.position , Vector3.down * groundTolerance, Color.yellow); 
@@ -1053,6 +1079,18 @@ public class Enemigo : MonoBehaviour
         ataqueA = 0; 
         ataqueB = 0;
         velocidadMov = 0;
+    }
+
+    void IniNave() 
+    {
+        puntosDeVida = 0;
+        ataqueCol = 0;
+        ataqueA = 0; 
+        ataqueB = 0;
+        velocidadMov = 0;
+
+        naveOrigenAttackers= transform.GetChild(1).GetChild(0).GetChild(0).GetChild(1); //no hay mejora manera?
+
     }
 
 
