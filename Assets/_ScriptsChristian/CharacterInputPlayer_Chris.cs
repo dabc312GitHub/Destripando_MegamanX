@@ -363,10 +363,12 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 	
     public void GroundedCheck() // mascara para que no sale encima de balas o enemigos?
     {
+    	LayerMask layerMask = LayerMask.GetMask("Piso", "PisoDestruible"); // evitar que salte sobre proyectiles y cosas que no sean suelo ,a ver
     	isGrounded = Physics.Raycast(
 		    transform.position, 
 		    jumpDirection,
-		    groundTolerance
+		    groundTolerance,
+		    layerMask
 	    );
     	//print("isGrounded: " + isGrounded);
     	//Debug.DrawRay(transform.position , jumpDirection * groundTolerance, Color.yellow); 
@@ -377,18 +379,20 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
     {
     	Vector3 centro = transform.position + new Vector3(0,0.5f,0);
     	RaycastHit hit;
+    	LayerMask layerMask = LayerMask.GetMask("Piso", "PisoDestruible"); // evitar que salte sobre proyectiles y cosas que no sean suelo ,a ver
     	float distancia = 0.5f;
     	isWallCollided = Physics.Raycast(
 		    centro, 
 		    transform.forward,
 		   	out hit,
-		    distancia
+		    distancia,
+		    layerMask
 	    );
 
     	if ( isWallCollided && !hit.transform.gameObject.CompareTag("Wall") )
     		isWallCollided = false;
 
-    	Debug.Log("hay pared?: " + isWallCollided);
+    	//Debug.Log("hay pared?: " + isWallCollided);
     	//Debug.DrawRay(centro , transform.forward * distancia, Color.yellow); 
     }
 

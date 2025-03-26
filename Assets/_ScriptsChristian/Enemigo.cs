@@ -13,8 +13,8 @@ public class Enemigo : MonoBehaviour
     [SerializeField] private Transform misil;
 
     private float puntosDeVida;
-    private float ataqueA;
-    private float ataqueB;
+   // private float ataqueA;
+   // private float ataqueB; no es necesario a estas alturas
     private float ataqueCol;
     private float velocidadMov;
     private Animator animator;
@@ -69,7 +69,8 @@ public class Enemigo : MonoBehaviour
         jamminger,
         roadAt,
         nave,
-        otro  //masa del crusher y proyectiles tal vez deberian estar aqui
+        otro,  //masa del crusher y proyectiles tal vez deberian estar aqui
+        boss
     }
 
     private TipoEnemigo tipoEnemigo;
@@ -109,7 +110,7 @@ public class Enemigo : MonoBehaviour
                  tipoEnemigo = TipoEnemigo.jamminger;
                  IniJamminger();
                  break;
-           case 7:
+            case 7:
                 tipoEnemigo = TipoEnemigo.roadAt;
                 IniRoadAt();
                 break;
@@ -117,8 +118,12 @@ public class Enemigo : MonoBehaviour
                 tipoEnemigo = TipoEnemigo.nave;
                 IniNave();
                 break;
+            case 99:
+                tipoEnemigo = TipoEnemigo.boss;
+                IniBoss();
+                break;
             default:
-                tipoEnemigo = TipoEnemigo.otro; //estoy usando este?
+                tipoEnemigo = TipoEnemigo.otro; //estoy usando este para masa de crusher? // 9
                 IniOtro();
                 break;
         }
@@ -128,6 +133,14 @@ public class Enemigo : MonoBehaviour
             mat = transform.GetChild(0).GetComponent<Renderer>().material;
         else
             mat =  null;
+
+        if(tipoEnemigo == TipoEnemigo.boss)
+        {
+            var matArray = transform.GetChild(1).GetComponent<Renderer>().materials;
+            matArray[1] = mat;
+            transform.GetChild(1).GetComponent<Renderer>().materials = matArray;
+        }
+
         col = GetComponent<Collider>();
         explotaScript = GetComponent<Explotar>();
         animEventsScript = GetComponent<AnimEvents>();
@@ -246,6 +259,7 @@ public class Enemigo : MonoBehaviour
             }
            
         }
+
         /* TIMELINE tiene la prioridad,no son simultaneas, lo ignora. Constraint funciona pero dificil empalmar posiciones del timeline
         else if( tipoEnemigo == TipoEnemigo.nave)
         {
@@ -255,6 +269,11 @@ public class Enemigo : MonoBehaviour
             //seguir a megaman ligeramente?
 
         }*/
+
+        else if(tipoEnemigo == TipoEnemigo.boss)
+        {
+            boss_comportamiento();
+        }
     }
 
     public void InstanceAttacker() // se llama como evento en animacion misma
@@ -785,8 +804,7 @@ public class Enemigo : MonoBehaviour
                 Movimiento(vectorMov);
             }
 
-            //roadAtAtaque();
-
+          
             float x = transform.position.x;
 
             if(Quaternion.Dot(transform.rotation,Quaternion.Euler(0, -90, 0) ) > 0.1f  ) //transform.rotation == Quaternion.Euler(0, -90, 0))
@@ -828,10 +846,20 @@ public class Enemigo : MonoBehaviour
         Vector3 pos = roadAtFiringPos.position;
      
         Transform bala = Instantiate(balaRoadAt);
-        bala.position = pos;
-        Debug.Log(" " + transform.right);
+        bala.position = pos;       
         bala.GetComponent<Rigidbody>().linearVelocity = new Vector3(-transform.right.z * 6,0,0);
    }
+
+
+    void boss_comportamiento()
+    {
+        float x = transform.position.x;
+        x  = Mathf.MoveTowards( x, megaman.position.x, Time.deltaTime * velocidadMov); 
+       
+        
+        transform.position = new Vector3 (x,transform.position.y,transform.position.z) ;
+
+    }
 
 
     void Movimiento(Vector3 vectorMov) 
@@ -851,14 +879,14 @@ public class Enemigo : MonoBehaviour
 
     void GroundedCheck()
     {
-       // LayerMask layerMask = LayerMask.GetMask("Piso", "PisoDestruible"); //mismos layer para el caso megaman (impedir saltar sobre balas y enemigos a veces)
+       // LayerMask layerMask = LayerMask.GetMask("Piso", "PisoDestruible"); //no es necesario, solo lo usa Spiky?
         isGrounded = Physics.Raycast(
             transform.position, 
             Vector3.down,
             groundTolerance
             //layerMask
         );
-        //print("isGrounded: " + isGrounded);
+        
        // Debug.DrawRay(transform.position , Vector3.down * groundTolerance, Color.yellow); 
 
     }
@@ -993,8 +1021,7 @@ public class Enemigo : MonoBehaviour
     {
         puntosDeVida = 2;
         ataqueCol = 2;
-        ataqueA = 0;
-        ataqueB = 0;
+  
         velocidadMov = 2.5f; //digamos
 
         //velocidadMov = 0; //debug
@@ -1005,8 +1032,7 @@ public class Enemigo : MonoBehaviour
     {
         puntosDeVida = 4;
         ataqueCol = 4;
-        ataqueA = 0;
-        ataqueB = 0;
+ 
         velocidadMov = .8f;
 
         crusherCrusher = transform.GetChild(2).GetChild(0).GetChild(0).GetChild(1); // no hay mejora manera?
@@ -1019,8 +1045,7 @@ public class Enemigo : MonoBehaviour
     {
         puntosDeVida = 4;
         ataqueCol = 1;
-        ataqueA = 0;
-        ataqueB = 0;
+ 
         velocidadMov =0.5f;
     }
 
@@ -1028,8 +1053,7 @@ public class Enemigo : MonoBehaviour
     {
         puntosDeVida = 16;
         ataqueCol = 3;
-        ataqueA = 2; // misiles
-        ataqueB = 2; // plasma o lo que fuere
+
         velocidadMov = 0;
     }
 
@@ -1037,8 +1061,7 @@ public class Enemigo : MonoBehaviour
     {
         puntosDeVida = 32;
         ataqueCol = 4;
-        ataqueA = 1; // ametralladora
-        ataqueB = 2; // misiles
+    
         velocidadMov = 2;
     }
 
@@ -1046,8 +1069,7 @@ public class Enemigo : MonoBehaviour
     {
         puntosDeVida = 2;
         ataqueCol = 2;
-        ataqueA = 1; // mina
-        ataqueB = 0;
+   
         velocidadMov = 2;
     }
 
@@ -1055,8 +1077,7 @@ public class Enemigo : MonoBehaviour
     {
         puntosDeVida = 2;
         ataqueCol = 1;
-        ataqueA = 0; 
-        ataqueB = 0;
+    
         velocidadMov = 3;
     }
 
@@ -1064,8 +1085,7 @@ public class Enemigo : MonoBehaviour
     {
         puntosDeVida = 12; // en 7 muere conductor,en 3 se queda quieto y explota
         ataqueCol = 2;
-        ataqueA = 1; 
-        ataqueB = 0;
+  
         velocidadMov = 3;
 
         roadAtFiringPos = transform.GetChild(4);
@@ -1076,8 +1096,6 @@ public class Enemigo : MonoBehaviour
         puntosDeVida = 9999; // no recibe daño(otro modo que no sea 9999?), si muere con maza abajo masa cae 
         ataqueCol = 4;
 
-        ataqueA = 0; 
-        ataqueB = 0;
         velocidadMov = 0;
     }
 
@@ -1085,12 +1103,18 @@ public class Enemigo : MonoBehaviour
     {
         puntosDeVida = 0;
         ataqueCol = 0;
-        ataqueA = 0; 
-        ataqueB = 0;
+ 
         velocidadMov = 0;
 
         naveOrigenAttackers= transform.GetChild(1).GetChild(0).GetChild(0).GetChild(1); //no hay mejora manera?
 
+    }
+
+    void IniBoss()
+    {
+        puntosDeVida = 9999;
+        ataqueCol = 1;
+        velocidadMov = 2;
     }
 
 

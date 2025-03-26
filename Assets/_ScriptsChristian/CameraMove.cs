@@ -62,7 +62,8 @@ public class CameraMove : MonoBehaviour
         if(col.name =="CamaraNave")
         {
             directorNave.Play();
-            GetComponent<Collider>().enabled = false; //desactivar collider de camara (o deberia ser col de la zona?) para no iniciarlo varias veces,           
+            GetComponent<Collider>().enabled = false; //desactivar collider de camara (o deberia ser col de la zona?) para no iniciarlo varias veces,
+            col.transform.GetChild(0).gameObject.SetActive(true);     
         }
         else
         {
