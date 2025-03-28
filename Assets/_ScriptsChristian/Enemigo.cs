@@ -835,7 +835,7 @@ public class Enemigo : MonoBehaviour
         } 
        
         //transform.rotation = Quaternion.Lerp(transform.rotation, rot, Time.deltaTime * 20f);
-        transform.rotation = rot; // si aparencen errores que sea giro brusco, menos vistoso pero menos errores ( si hubiera)
+        transform.rotation = rot; // si aparencen errores que sea giro brusco, menos vistoso pero menos errores ( si hubiera (si hay))
 
    }
 
@@ -850,14 +850,146 @@ public class Enemigo : MonoBehaviour
         bala.GetComponent<Rigidbody>().linearVelocity = new Vector3(-transform.right.z * 6,0,0);
    }
 
-
-    void boss_comportamiento()
+   private float bossEspera = 0f;
+   private bool bossEsperar = false; //esperar es un nombre engañoso
+   private bool  bossSaltando = false;
+   private int  bossSaltoProb = 0;
+    void boss_comportamiento()  
     {
-        float x = transform.position.x;
-        x  = Mathf.MoveTowards( x, megaman.position.x, Time.deltaTime * velocidadMov); 
        
+        LayerMask layerMask = LayerMask.GetMask("Piso", "PisoDestruible"); 
+        RaycastHit hit;
+        bool suelo = Physics.Raycast(
+            transform.position, 
+            Vector3.down,
+            out hit,
+            0.1f,
+            layerMask
+        );
+
+        Quaternion rot = transform.rotation;
         
-        transform.position = new Vector3 (x,transform.position.y,transform.position.z) ;
+        float overdrive = 1.5f;
+
+        velocidadMov = 4f;
+        
+        if(!suelo && !bossSaltando)
+        {
+           vectorMov.y = -2 * 2; //-velocidadMov *
+           animator.SetTrigger("Salto");
+           animator.SetBool("Idle",false);           
+           Movimiento(vectorMov); 
+
+        }
+
+        else
+        {   
+            //animator.SetBool("Idle", true);
+            animator.SetFloat("Speed",0f);
+            rot = Quaternion.Euler(0, 275 , 0);
+            float x = transform.position.x;
+            x = Mathf.MoveTowards( x, megaman.position.x + overdrive , Time.deltaTime * velocidadMov);
+
+            
+            if ( megaman.position.x < transform.position.x) // megaman izq
+            {
+                 Debug.Log(bossSaltando);
+                if(!bossSaltando)
+                    bossSaltoProb =   (int) Random.Range(0, 600);
+
+                if(bossSaltoProb == 1)
+                {                   
+                    bossSaltando = true;
+                }
+
+                
+
+                if (bossSaltando)
+                {   
+                    animator.SetBool("Idle", false);
+                    animator.SetTrigger("Salto");
+                    transform.position += new Vector3 (10 * Time.deltaTime, 4 * Time.deltaTime,0);
+
+                    if(megaman.position.x + 6 <= transform.position.x)
+                    {
+                         animator.SetBool("Idle", true);                        
+                         bossSaltando = false;
+                         velocidadMov = 6;
+                         animator.SetFloat("Speed",1);
+                    }
+
+                }
+          
+
+                else 
+                {
+                      if( megaman.position.x >= transform.position.x - overdrive  ) //atacar 
+                      {
+                            bossEspera = 0;
+                            bossEsperar = false;
+                            animator.SetTrigger("Ataque");
+                            animator.SetBool("Idle", false);
+                            animator.SetFloat("Speed",0);
+                            velocidadMov = 4;
+                      }
+
+                    
+                      else // perseguir
+                      {
+                            bossEspera += Time.deltaTime;
+                            animator.SetBool("Idle", true);
+                            animator.SetFloat("Speed",0f);
+                            if( bossEspera >= 2f )
+                             bossEsperar = true;
+                            
+                            if(bossEsperar)
+                            {
+                                animator.SetBool("Idle",true);
+                                animator.SetFloat("Speed",0.5f);
+                                transform.position = new Vector3 (x,transform.position.y,transform.position.z);
+                            }
+                            
+                     }
+                }
+
+               
+            }
+
+            else //megaman der
+            {
+          
+                 rot = Quaternion.Euler(0, 125 , 0);
+                if( megaman.position.x <= transform.position.x + overdrive  ) //atacar 
+                {
+                    bossEspera = 0;
+                    bossEsperar = false;
+                    animator.SetBool("Idle", false);
+                    animator.SetTrigger("Ataque");
+                    animator.SetFloat("Speed",0);
+                     velocidadMov = 4;
+                }
+        
+                else // perseguir
+                {
+                    // no hacer nada un tiempito
+                    bossEspera += Time.deltaTime;
+                    animator.SetBool("Idle", true);
+                    animator.SetFloat("Speed",0f);
+                   if( bossEspera >= 2f )
+                         bossEsperar = true;
+                    if(bossEsperar)
+                    {
+                        animator.SetBool("Idle",true);
+                         animator.SetFloat("Speed",0.5f);
+                        transform.position = new Vector3 (x,transform.position.y,transform.position.z);
+                    }
+                   
+                }
+            
+            }
+          
+           transform.rotation = Quaternion.Lerp(transform.rotation,rot, Time.deltaTime * 10f);
+        }
 
     }
 
