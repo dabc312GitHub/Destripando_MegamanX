@@ -6,11 +6,12 @@ using UnityEngine.Playables;
 public class Enemigo : MonoBehaviour
 {
     [SerializeField] private PlayableDirector abejaDirector;
-    [SerializeField] private Camera camara;
+    [SerializeField] private Camera camara = null;
     [SerializeField] private Transform sueloAbeja;
     [SerializeField] private int id = 0;
     [SerializeField] private Transform salidaMisiles;
     [SerializeField] private Transform misil;
+
 
     private float puntosDeVida;
    // private float ataqueA;
@@ -52,11 +53,24 @@ public class Enemigo : MonoBehaviour
 
     private bool ataqueInicio = false;
 
-    [SerializeField] private Transform enemigoInstancia;  
+    [SerializeField] private PlayableDirector naveDirector;
+    [SerializeField] private Transform enemigoInstancia;
+    [SerializeField] private Transform vile;
+    private List<Transform> carritos = new List<Transform>();  
     private Transform naveOrigenAttackers;
 
+   private float bossEspera = 0f;
+   private bool bossEsperar = false; //esperar es un nombre engañoso
+   private bool  bossSaltando = false;
+   private int  bossSaltoProb = 0;
 
     private Transform megaman;
+
+
+    private float groundTolerance =0.1f;
+    private bool isGrounded = false;
+    private bool isWallCollided = false;
+
 
     private enum TipoEnemigo
     {
@@ -127,18 +141,23 @@ public class Enemigo : MonoBehaviour
                 IniOtro();
                 break;
         }
+
         animator = GetComponent<Animator>();
 
-        if (tipoEnemigo != TipoEnemigo.otro)
+        if (tipoEnemigo != TipoEnemigo.otro && name != "brazo.l")
             mat = transform.GetChild(0).GetComponent<Renderer>().material;
         else
             mat =  null;
 
         if(tipoEnemigo == TipoEnemigo.boss)
         {
-            var matArray = transform.GetChild(1).GetComponent<Renderer>().materials;
-            matArray[1] = mat;
-            transform.GetChild(1).GetComponent<Renderer>().materials = matArray;
+            if( name != "brazo.l")
+            {
+                var matArray = transform.GetChild(1).GetComponent<Renderer>().materials;
+                matArray[1] = mat;
+                transform.GetChild(1).GetComponent<Renderer>().materials = matArray;
+            }
+            
         }
 
         col = GetComponent<Collider>();
@@ -146,6 +165,9 @@ public class Enemigo : MonoBehaviour
         animEventsScript = GetComponent<AnimEvents>();
 
         megaman = GameObject.Find("megamanxCompleto").transform;
+
+        if(!camara)
+            camara = Camera.main;
 
 
     }
@@ -260,25 +282,52 @@ public class Enemigo : MonoBehaviour
            
         }
 
-        /* TIMELINE tiene la prioridad,no son simultaneas, lo ignora. Constraint funciona pero dificil empalmar posiciones del timeline
+       
         else if( tipoEnemigo == TipoEnemigo.nave)
         {
+             // TIMELINE tiene la prioridad,no son simultaneas, lo ignora. Constraint funciona pero dificil empalmar posiciones del timeline
+            /*
             Vector3 megamanPos = megaman.position;
             float x = Mathf.Lerp( transform.position.x, megaman.position.x, Time.deltaTime * 10f );
             transform.position = new Vector3( x,transform.position.y,transform.position.z);
-            //seguir a megaman ligeramente?
+            //seguir a megaman ligeramente?*/
 
-        }*/
+            if(carritos.Count ==2)
+            {
+                float a = carritos[0].GetComponent<Enemigo>().getVida();
+                float b = carritos[1].GetComponent<Enemigo>().getVida();
+                if(a <=0 && b <=0 )
+                {
 
-        else if(tipoEnemigo == TipoEnemigo.boss)
+                    megaman.GetComponent<Impacto>().setEndGame(true);
+                    //naveDirector.Resume();
+                    naveDirector.playableGraph.GetRootPlayable(0).SetSpeed(1);
+                }
+            }
+
+        }
+
+        else if(tipoEnemigo == TipoEnemigo.boss && name != "brazo.l") //parches por todos lados
         {
-            boss_comportamiento();
+           
+            if(megaman.GetComponent<Impacto>().getVivo())
+                boss_postComportamiento();
+            else
+                boss_comportamiento();
         }
     }
 
     public void InstanceAttacker() // se llama como evento en animacion misma
     {
        Transform attacker = Instantiate(enemigoInstancia);
+       carritos.Add(attacker);
+       attacker.position = naveOrigenAttackers.position;
+  
+    }
+
+    public void InstanceVile() // se llama como evento en animacion misma
+    {
+       Transform attacker = Instantiate(vile);
        attacker.position = naveOrigenAttackers.position;
   
     }
@@ -359,8 +408,6 @@ public class Enemigo : MonoBehaviour
         float alto = salidas[0].y;
         float bajo = salidas[2].y;
 
-        
-
         Vector3 origenA = new Vector3(salidas[4].x,alto,salidas[4].z );  //salidas[4];
         Vector3 origenB = new Vector3(salidas[4].x,bajo,salidas[4].z );  //salidas[4];
 
@@ -409,7 +456,6 @@ public class Enemigo : MonoBehaviour
         animator.SetBool("Attack", false); 
         yield return null;
     }
-
 
 
 
@@ -850,10 +896,7 @@ public class Enemigo : MonoBehaviour
         bala.GetComponent<Rigidbody>().linearVelocity = new Vector3(-transform.right.z * 6,0,0);
    }
 
-   private float bossEspera = 0f;
-   private bool bossEsperar = false; //esperar es un nombre engañoso
-   private bool  bossSaltando = false;
-   private int  bossSaltoProb = 0;
+   
     void boss_comportamiento()  
     {
        
@@ -871,8 +914,9 @@ public class Enemigo : MonoBehaviour
         
         float overdrive = 1.5f;
 
-        velocidadMov = 4f;
-        
+        //velocidadMov = 4f;
+        float velocidadAnim = 0; //mal planteado, no funciona pero no es crítico
+           
         if(!suelo && !bossSaltando)
         {
            vectorMov.y = -2 * 2; //-velocidadMov *
@@ -885,7 +929,7 @@ public class Enemigo : MonoBehaviour
         else
         {   
             //animator.SetBool("Idle", true);
-            animator.SetFloat("Speed",0f);
+            animator.SetFloat("Speed",0); // 0
             rot = Quaternion.Euler(0, 275 , 0);
             float x = transform.position.x;
             x = Mathf.MoveTowards( x, megaman.position.x + overdrive , Time.deltaTime * velocidadMov);
@@ -893,7 +937,7 @@ public class Enemigo : MonoBehaviour
             
             if ( megaman.position.x < transform.position.x) // megaman izq
             {
-                 Debug.Log(bossSaltando);
+                 
                 if(!bossSaltando)
                     bossSaltoProb =   (int) Random.Range(0, 600);
 
@@ -915,7 +959,8 @@ public class Enemigo : MonoBehaviour
                          animator.SetBool("Idle", true);                        
                          bossSaltando = false;
                          velocidadMov = 6;
-                         animator.SetFloat("Speed",1);
+                         velocidadAnim = 1;
+                         animator.SetFloat("Speed",velocidadAnim); //1
                     }
 
                 }
@@ -929,7 +974,8 @@ public class Enemigo : MonoBehaviour
                             bossEsperar = false;
                             animator.SetTrigger("Ataque");
                             animator.SetBool("Idle", false);
-                            animator.SetFloat("Speed",0);
+                            velocidadAnim = 0;
+                            animator.SetFloat("Speed",velocidadAnim); //0
                             velocidadMov = 4;
                       }
 
@@ -938,14 +984,15 @@ public class Enemigo : MonoBehaviour
                       {
                             bossEspera += Time.deltaTime;
                             animator.SetBool("Idle", true);
-                            animator.SetFloat("Speed",0f);
-                            if( bossEspera >= 2f )
+                            animator.SetFloat("Speed",0);//0
+                            if( bossEspera >= 1f )
                              bossEsperar = true;
                             
                             if(bossEsperar)
                             {
                                 animator.SetBool("Idle",true);
-                                animator.SetFloat("Speed",0.5f);
+                                velocidadAnim = 0.5f;
+                                animator.SetFloat("Speed",velocidadAnim);  //0.5f
                                 transform.position = new Vector3 (x,transform.position.y,transform.position.z);
                             }
                             
@@ -974,13 +1021,13 @@ public class Enemigo : MonoBehaviour
                     // no hacer nada un tiempito
                     bossEspera += Time.deltaTime;
                     animator.SetBool("Idle", true);
-                    animator.SetFloat("Speed",0f);
+                    animator.SetFloat("Speed",0);
                    if( bossEspera >= 2f )
                          bossEsperar = true;
                     if(bossEsperar)
                     {
                         animator.SetBool("Idle",true);
-                         animator.SetFloat("Speed",0.5f);
+                         animator.SetFloat("Speed",0.5f); 
                         transform.position = new Vector3 (x,transform.position.y,transform.position.z);
                     }
                    
@@ -988,10 +1035,89 @@ public class Enemigo : MonoBehaviour
             
             }
           
-           transform.rotation = Quaternion.Lerp(transform.rotation,rot, Time.deltaTime * 10f);
+           transform.rotation = Quaternion.Lerp(transform.rotation,rot, Time.deltaTime );
         }
 
     }
+
+    void boss_postComportamiento() // posicionarse a la derecha de megaman 
+    {
+
+        //Lanzar el rayo, activar megaman arrodillado, desactivar controlador de megaman, repos camara, acercarse coger megaman y al final activar animacion Timeline de final
+
+        camara.GetComponent<CameraMove>().enabled = false;
+        float c = camara.transform.position.x;
+        c = Mathf.Lerp( c, megaman.position.x , Time.deltaTime * 10f );  //probar valores mas peque 0.5f ? mas lentito...
+
+       camara.transform.position = new Vector3( c, camara.transform.position.y, camara.transform.position.z  );
+
+        megaman.GetComponent<CharacterInputPlayer_Chris>().enabled = false;
+        megaman.GetComponent<Impacto>().enabled = false;
+        Quaternion rot = transform.rotation;
+        velocidadMov = 1;
+        
+        float overdrive = 1.5f;
+
+        animator.SetFloat("Speed",0.5f);
+        animator.SetBool("Idle",true); 
+       
+
+        float x = transform.position.x;
+        x = Mathf.MoveTowards( x, megaman.position.x + overdrive , Time.deltaTime * velocidadMov);
+
+        transform.position = new Vector3 (x,transform.position.y,transform.position.z);
+
+        if( transform.position.x >= megaman.position.x + overdrive )
+        {
+             rot = Quaternion.Euler(0, 275 , 0);
+             animator.SetFloat("Speed",0);
+              animator.SetBool("Brazo",true);
+        }
+
+        /*
+        if ( megaman.position.x < transform.position.x) // megaman izq
+        {
+             rot = Quaternion.Euler(0, 275 , 0);
+           
+            if( megaman.position.x >= transform.position.x + overdrive  ) //atacar 
+             {
+                animator.SetTrigger("Ataque");
+                animator.SetBool("Idle", false);                   
+                animator.SetFloat("Speed",0);                   
+            }
+            
+            else // perseguir
+            {
+                animator.SetBool("Idle",true);                 
+                animator.SetFloat("Speed",0.5f);  
+                transform.position = new Vector3 (x,transform.position.y,transform.position.z);                 
+            }
+        }
+                
+     
+
+        else //megaman der
+        {
+      
+            rot = Quaternion.Euler(0, 125 , 0);
+            if( megaman.position.x <= transform.position.x + overdrive  ) //atacar 
+            {
+                animator.SetBool("Idle", false);
+                animator.SetTrigger("Ataque");
+                animator.SetFloat("Speed",0);               
+            }
+    
+            else // perseguir
+            {
+                animator.SetBool("Idle",true);
+                animator.SetFloat("Speed",0.5f); 
+                transform.position = new Vector3 (x,transform.position.y,transform.position.z);
+            }
+        
+        }*/
+          
+        transform.rotation = Quaternion.Lerp(transform.rotation,rot, Time.deltaTime * 10f);        
+    }   
 
 
     void Movimiento(Vector3 vectorMov) 
@@ -1003,10 +1129,6 @@ public class Enemigo : MonoBehaviour
     {
         derecha = !derecha;       
     }
-
-    private float groundTolerance =0.1f;
-    private bool isGrounded = false;
-    private bool isWallCollided = false;
 
 
     void GroundedCheck()
@@ -1245,8 +1367,13 @@ public class Enemigo : MonoBehaviour
     void IniBoss()
     {
         puntosDeVida = 9999;
-        ataqueCol = 1;
-        velocidadMov = 2;
+        ataqueCol = 3; // colision 1, puño era 3 ¯\_(ツ)_/¯
+        velocidadMov = 4;
+    }
+
+    public float getVida()
+    {
+        return puntosDeVida;
     }
 
 

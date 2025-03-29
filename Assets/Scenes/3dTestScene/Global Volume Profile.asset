@@ -108,7 +108,7 @@ MonoBehaviour:
   active: 1
   intensity:
     m_OverrideState: 1
-    m_Value: 0.071
+    m_Value: 0.055
 --- !u!114 &-344274998054674645
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -169,6 +169,7 @@ MonoBehaviour:
   m_Name: Global Volume Profile
   m_EditorClassIdentifier: 
   components:
+  - {fileID: 5249502225510709851}
   - {fileID: -344274998054674645}
   - {fileID: -2687827196312812109}
   - {fileID: -3988644446114300729}
@@ -243,6 +244,28 @@ MonoBehaviour:
   chromaticAbberationIntensity:
     m_OverrideState: 0
     m_Value: 1
+--- !u!114 &5249502225510709851
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5485954d14dfb9a4c8ead8edb0ded5b1, type: 3}
+  m_Name: LiftGammaGain
+  m_EditorClassIdentifier: 
+  active: 1
+  lift:
+    m_OverrideState: 1
+    m_Value: {x: 1, y: 1, z: 1, w: -0.018382354}
+  gamma:
+    m_OverrideState: 1
+    m_Value: {x: 1, y: 1, z: 1, w: 0.055147067}
+  gain:
+    m_OverrideState: 1
+    m_Value: {x: 0.90820646, y: 1, z: 0.99619126, w: 0.20220591}
 --- !u!114 &5906155318575828416
 MonoBehaviour:
   m_ObjectHideFlags: 3

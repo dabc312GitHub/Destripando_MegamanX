@@ -17,6 +17,7 @@ public class Impacto : MonoBehaviour
     private Collider extension;
     private float vida = 20f;
     private float vidaMaxima;
+    private bool endGame = false; // no morir cuando vile me mate
 
     void Start()
     {
@@ -32,6 +33,11 @@ public class Impacto : MonoBehaviour
         megamanMatB.SetFloat("_Invulnerable",0.0f);
         vidaMaxima = vida;
 
+    }
+
+    public void setEndGame(bool fin)
+    {
+        endGame = fin;
     }
 
     public Collider getExtension()
@@ -74,7 +80,13 @@ public class Impacto : MonoBehaviour
     {
         vida -= d; 
         if( vida <= 0)
-            Muerte();                  
+        {
+            if(!endGame)
+                Muerte();
+           /* else
+                vidaUI.SetFloat("_Salud", 0.0f);*/ //que quede con un cachito de vida visualmente?
+
+        }
         else
             vidaUI.SetFloat("_Salud", vida/vidaMaxima);
        
