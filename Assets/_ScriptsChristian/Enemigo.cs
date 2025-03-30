@@ -153,6 +153,7 @@ public class Enemigo : MonoBehaviour
         {
             if( name != "brazo.l")
             {
+               esfera = transform.Find("VileArm/raiz/pelvis/torso/arma/VileEsfera");
                 var matArray = transform.GetChild(1).GetComponent<Renderer>().materials;
                 matArray[1] = mat;
                 transform.GetChild(1).GetComponent<Renderer>().materials = matArray;
@@ -268,7 +269,7 @@ public class Enemigo : MonoBehaviour
             if(ataqueInicio == false && distancia < 8)
                 ataqueInicio = true;
 
-            if(ataqueInicio)
+            if(ataqueInicio && puntosDeVida >0) 
             {
                 roadAt_comportamiento();
 
@@ -311,7 +312,11 @@ public class Enemigo : MonoBehaviour
         {
            
             if(megaman.GetComponent<Impacto>().getVivo())
-                boss_postComportamiento();
+            {
+                boss_Paralizar();
+                if(disparo) 
+                    boss_postComportamiento();
+            }
             else
                 boss_comportamiento();
         }
@@ -1039,15 +1044,82 @@ public class Enemigo : MonoBehaviour
         }
 
     }
+private Transform esfera; 
+    bool boss_Paralizar()
+    {
+        if(disparo)
+            return true;
 
+             
+        animator.SetBool("Idle", false);
+        animator.SetTrigger("Salto");
+        //transform.position += new Vector3 (-5 * Time.deltaTime, 2 * Time.deltaTime,0);
+        transform.rotation = Quaternion.Lerp(transform.rotation,Quaternion.Euler(0,110,0), Time.deltaTime * 30f); 
+
+        if(megaman.position.x - 5 >= transform.position.x)
+        {
+
+            LayerMask layerMask = LayerMask.GetMask("Piso", "PisoDestruible"); 
+            RaycastHit hit;
+            bool suelo = Physics.Raycast(
+                transform.position, 
+                Vector3.down,
+                out hit,
+                0.1f,
+                layerMask
+            );
+
+            if(suelo)
+            {
+                 animator.SetBool("Idle", true);  
+                 animator.SetFloat("Speed",1);
+                 Debug.Log("TE DISPAROOOO");                 
+                 esfera.gameObject.SetActive(true);                 
+                 disparo = true;
+                 return true; 
+            }
+            else
+            {
+               vectorMov.y = -2 * 2; 
+               animator.SetTrigger("Salto");
+               animator.SetBool("Idle",false);           
+               Movimiento(vectorMov);
+               return false; 
+            }
+
+        }
+
+
+        else
+        {
+            transform.position += new Vector3 (-5 * Time.deltaTime, 2 * Time.deltaTime,0);
+            return false;
+        }
+        
+       
+    }
+    private bool disparo = false;
+    private bool agarre = false;
     void boss_postComportamiento() // posicionarse a la derecha de megaman 
     {
+        
+        esfera.position = Vector3.MoveTowards(esfera.position, megaman.position, Time.deltaTime *5);
+        if( esfera.position.x ==  megaman.position.x)
+            esfera.gameObject.SetActive(false);
 
         //Lanzar el rayo, activar megaman arrodillado, desactivar controlador de megaman, repos camara, acercarse coger megaman y al final activar animacion Timeline de final
+        Animator megaAnimator =  megaman.GetComponent<Animator>();
+        megaAnimator.SetLayerWeight(2, megaAnimator.GetLayerWeight(2) + Time.deltaTime *0.5f ); //hace clamp en 1 me imagino
+
+        Transform brazo = transform.Find("VileArm/raiz/pelvis/torso/brazo.l");
+        brazo.GetComponent<Collider>().enabled = false;
+        Vector3 posAgarre = brazo.Find("antebrazo.l/mano.l").position + new Vector3(0,-0.5f,0);
+
+        GetComponent<Collider>().enabled = false; 
 
         camara.GetComponent<CameraMove>().enabled = false;
         float c = camara.transform.position.x;
-        c = Mathf.Lerp( c, megaman.position.x , Time.deltaTime * 10f );  //probar valores mas peque 0.5f ? mas lentito...
+        c = Mathf.Lerp( c, megaman.position.x , Time.deltaTime * 0.5f ); 
 
        camara.transform.position = new Vector3( c, camara.transform.position.y, camara.transform.position.z  );
 
@@ -1065,58 +1137,36 @@ public class Enemigo : MonoBehaviour
         float x = transform.position.x;
         x = Mathf.MoveTowards( x, megaman.position.x + overdrive , Time.deltaTime * velocidadMov);
 
-        transform.position = new Vector3 (x,transform.position.y,transform.position.z);
+        if(!agarre)
+            transform.position = new Vector3 (x,transform.position.y,transform.position.z);
 
+         Quaternion rotMega =  Quaternion.Euler(0, 90 , 0);        
+            
         if( transform.position.x >= megaman.position.x + overdrive )
         {
-             rot = Quaternion.Euler(0, 275 , 0);
+             agarre = true;
+             rot = Quaternion.Euler(0, 275 , 0);            
              animator.SetFloat("Speed",0);
-              animator.SetBool("Brazo",true);
-        }
-
-        /*
-        if ( megaman.position.x < transform.position.x) // megaman izq
-        {
-             rot = Quaternion.Euler(0, 275 , 0);
+             animator.SetBool("Brazo",true);
+             megaAnimator.SetBool("Fin",true);
            
-            if( megaman.position.x >= transform.position.x + overdrive  ) //atacar 
-             {
-                animator.SetTrigger("Ataque");
-                animator.SetBool("Idle", false);                   
-                animator.SetFloat("Speed",0);                   
-            }
-            
-            else // perseguir
-            {
-                animator.SetBool("Idle",true);                 
-                animator.SetFloat("Speed",0.5f);  
-                transform.position = new Vector3 (x,transform.position.y,transform.position.z);                 
-            }
         }
-                
-     
 
-        else //megaman der
+       
+        if( agarre  && Vector3.Dot( transform.forward, Vector3.right ) < -0.75)  // 0.25 ta bien?
         {
-      
-            rot = Quaternion.Euler(0, 125 , 0);
-            if( megaman.position.x <= transform.position.x + overdrive  ) //atacar 
-            {
-                animator.SetBool("Idle", false);
-                animator.SetTrigger("Ataque");
-                animator.SetFloat("Speed",0);               
-            }
-    
-            else // perseguir
-            {
-                animator.SetBool("Idle",true);
-                animator.SetFloat("Speed",0.5f); 
-                transform.position = new Vector3 (x,transform.position.y,transform.position.z);
-            }
-        
-        }*/
-          
-        transform.rotation = Quaternion.Lerp(transform.rotation,rot, Time.deltaTime * 10f);        
+             float megamanX = megaman.position.x;
+             float megamanY = megaman.position.y;
+             megamanX = Mathf.Lerp(megamanX, posAgarre.x, Time.deltaTime * 10f );
+             megamanY = Mathf.Lerp(megamanY, posAgarre.y, Time.deltaTime *10f );
+             megaman.position = new Vector3(megamanX, megamanY, megaman.position.z);
+            
+        }
+
+        if(agarre)
+             megaman.transform.rotation = Quaternion.Lerp(megaman.transform.rotation, rotMega, Time.deltaTime * 30f);
+
+        transform.rotation = Quaternion.Lerp(transform.rotation,rot, Time.deltaTime * 30f);        
     }   
 
 

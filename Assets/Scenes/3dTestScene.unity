@@ -41101,7 +41101,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7988531120659611726, guid: 6a0eefab568bb6a49ba9469e5fb6bfc9, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -78263,6 +78263,10 @@ PrefabInstance:
       propertyPath: camara
       value: 
       objectReference: {fileID: 1455767804}
+    - target: {fileID: 8919187305470468626, guid: c90e300085ac60c48a6e302125784f49, type: 3}
+      propertyPath: m_Sources.Array.data[0].sourceTransform
+      value: 
+      objectReference: {fileID: 1622156085}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -79181,7 +79185,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7320361596161727220, guid: 6a0eefab568bb6a49ba9469e5fb6bfc9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.29
       objectReference: {fileID: 0}
     - target: {fileID: 7320361596161727220, guid: 6a0eefab568bb6a49ba9469e5fb6bfc9, type: 3}
       propertyPath: m_LocalPosition.z
@@ -79221,7 +79225,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7988531120659611726, guid: 6a0eefab568bb6a49ba9469e5fb6bfc9, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
