@@ -5,6 +5,7 @@ using UnityEngine.Playables;
 
 public class Enemigo : MonoBehaviour
 {
+     private Transform finObjeto = null;   
     [SerializeField] private PlayableDirector abejaDirector;
     [SerializeField] private Camera camara = null;
     [SerializeField] private Transform sueloAbeja;
@@ -65,6 +66,7 @@ public class Enemigo : MonoBehaviour
    private int  bossSaltoProb = 0;
 
     private Transform megaman;
+    private Transform zero = null;
 
 
     private float groundTolerance =0.1f;
@@ -153,10 +155,12 @@ public class Enemigo : MonoBehaviour
         {
             if( name != "brazo.l")
             {
-               esfera = transform.Find("VileArm/raiz/pelvis/torso/arma/VileEsfera");
+                zero = GameObject.Find("zero").transform;
+                esfera = transform.Find("VileArm/raiz/pelvis/torso/arma/VileEsfera");
                 var matArray = transform.GetChild(1).GetComponent<Renderer>().materials;
                 matArray[1] = mat;
                 transform.GetChild(1).GetComponent<Renderer>().materials = matArray;
+                finObjeto = GameObject.Find("FIN").transform;
             }
             
         }
@@ -286,7 +290,7 @@ public class Enemigo : MonoBehaviour
        
         else if( tipoEnemigo == TipoEnemigo.nave)
         {
-             // TIMELINE tiene la prioridad,no son simultaneas, lo ignora. Constraint funciona pero dificil empalmar posiciones del timeline
+             // TIMELINE tiene la prioridad,no son simultaneas, lo ignora. Constraint funciona pero dificil empalmar posiciones del timeline, con root motion? pero ya no estoy pa esos juegos
             /*
             Vector3 megamanPos = megaman.position;
             float x = Mathf.Lerp( transform.position.x, megaman.position.x, Time.deltaTime * 10f );
@@ -1100,6 +1104,7 @@ private Transform esfera;
     }
     private bool disparo = false;
     private bool agarre = false;
+    
     void boss_postComportamiento() // posicionarse a la derecha de megaman 
     {
         
@@ -1163,10 +1168,23 @@ private Transform esfera;
             
         }
 
+        
+
         if(agarre)
              megaman.transform.rotation = Quaternion.Lerp(megaman.transform.rotation, rotMega, Time.deltaTime * 30f);
 
-        transform.rotation = Quaternion.Lerp(transform.rotation,rot, Time.deltaTime * 30f);        
+        transform.rotation = Quaternion.Lerp(transform.rotation,rot, Time.deltaTime * 30f); 
+
+        if(  megaman.position.x == posAgarre.x  ) // fin del agarre? comprobar que sea exacto o usar aproximatly, hmm demora un poqquito en lograr
+        {
+            //posicionar zero
+            if(zero)
+            {
+                //zero.gameObject.SetActive(true);
+                zero.position = megaman.position + new Vector3(-4,0,0 );
+            }
+            finObjeto.transform.GetComponent<PlayableDirector>().enabled = true;
+        }       
     }   
 
 
