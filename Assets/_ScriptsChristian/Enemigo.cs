@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Playables;
+using UnityEngine.Timeline;
 
 public class Enemigo : MonoBehaviour
 {
@@ -1129,6 +1130,7 @@ private Transform esfera;
 
         megaman.GetComponent<CharacterInputPlayer_Chris>().enabled = false;
         megaman.GetComponent<Impacto>().enabled = false;
+        megaman.GetComponent<CharacterController>().enabled = false;
         Quaternion rot = transform.rotation;
         velocidadMov = 1;
         
@@ -1154,12 +1156,10 @@ private Transform esfera;
              rot = Quaternion.Euler(0, 275 , 0);            
              animator.SetFloat("Speed",0);
              animator.SetBool("Brazo",true);
-             megaAnimator.SetBool("Fin",true);
-           
+             megaAnimator.SetBool("Fin",true);           
         }
 
-       
-       
+             
         if(!fin.isActiveAndEnabled && agarre  && Vector3.Dot( transform.forward, Vector3.right ) < -0.75)  // 0.25 ta bien?
         {
              float megamanX = megaman.position.x;
@@ -1171,16 +1171,19 @@ private Transform esfera;
         }
 
         
-
         if(agarre)
              megaman.transform.rotation = Quaternion.Lerp(megaman.transform.rotation, rotMega, Time.deltaTime * 30f);
 
         transform.rotation = Quaternion.Lerp(transform.rotation,rot, Time.deltaTime * 30f); 
 
-        float megamanAprox = Mathf.Round( megaman.position.x * 10f ) *0.1f;
-        float AgarreAprox = Mathf.Round( posAgarre.x * 10f ) *0.1f;
+        float megamanAprox = Mathf.Round( megaman.position.x * 100f ) *0.01f;
+        float AgarreAprox = Mathf.Round( posAgarre.x * 100f ) *0.01f;
         
-        if( agarre &&  megamanAprox == AgarreAprox  ) // fin del agarre
+        float megamanAproxY = Mathf.Round( megaman.position.y * 100f ) *0.01f;
+        float AgarreAproxY = Mathf.Round( posAgarre.y * 100f ) *0.01f;
+
+       
+        if( agarre &&  megamanAprox == AgarreAprox  && megamanAproxY == AgarreAproxY) // fin del agarre
         {
             //posicionar zero
             if(zero)
@@ -1190,10 +1193,21 @@ private Transform esfera;
                 vilePos.position = transform.position;
                 transform.SetParent(vilePos);
                 transform.localPosition  = Vector3.zero;
-                zero.parent.position = megaman.position + new Vector3(-6,-0.5f,0 );
+                zero.parent.position = megaman.position + new Vector3(-6,-0.48f,0 ); 
             }
+           
+            var vaina = (TimelineAsset)fin.playableAsset; 
+            fin.SetGenericBinding(vaina.GetOutputTrack(8), transform.GetChild(0).gameObject); // posicion del track en timeline y el brazo
             fin.enabled = true;
         }       
+    }
+
+    public void NaveReposicionar()
+    {
+        //if(naveDirector)naveDirector.enabled = false;       
+        Transform vilePos = GameObject.Find("VilePos").transform;
+        transform.position = new Vector3( vilePos.position.x + 2f,  transform.position.y, transform.position.z);
+        
     }   
 
 
