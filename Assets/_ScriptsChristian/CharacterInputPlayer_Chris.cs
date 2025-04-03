@@ -351,6 +351,11 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 	
 	
 	}
+
+	public void timelineAnimFin() // hmmmm
+	{
+		anim.SetBool("Fin",false);
+	}
 	
 	void FixedUpdate ()
 	{

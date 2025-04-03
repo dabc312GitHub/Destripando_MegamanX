@@ -1049,7 +1049,7 @@ public class Enemigo : MonoBehaviour
 
     }
 private Transform esfera; 
-    bool boss_Paralizar()
+    bool boss_Paralizar()  //cuidado, mega si muere en el aire?
     {
         if(disparo)
             return true;
@@ -1076,15 +1076,14 @@ private Transform esfera;
             if(suelo)
             {
                  animator.SetBool("Idle", true);  
-                 animator.SetFloat("Speed",1);
-                 Debug.Log("TE DISPAROOOO");                 
+                 animator.SetFloat("Speed",1);                             
                  esfera.gameObject.SetActive(true);                 
                  disparo = true;
                  return true; 
             }
             else
             {
-               vectorMov.y = -2 * 2; 
+               vectorMov.y = -3 * 2;   //-2
                animator.SetTrigger("Salto");
                animator.SetBool("Idle",false);           
                Movimiento(vectorMov);
@@ -1145,9 +1144,11 @@ private Transform esfera;
         if(!agarre)
             transform.position = new Vector3 (x,transform.position.y,transform.position.z);
 
-         Quaternion rotMega =  Quaternion.Euler(0, 90 , 0);        
+         Quaternion rotMega =  Quaternion.Euler(0, 90 , 0);   
+
+          PlayableDirector fin = finObjeto.transform.GetComponent<PlayableDirector>();     
             
-        if( transform.position.x >= megaman.position.x + overdrive )
+        if( !fin.isActiveAndEnabled && transform.position.x >= megaman.position.x + overdrive )
         {
              agarre = true;
              rot = Quaternion.Euler(0, 275 , 0);            
@@ -1158,7 +1159,8 @@ private Transform esfera;
         }
 
        
-        if( agarre  && Vector3.Dot( transform.forward, Vector3.right ) < -0.75)  // 0.25 ta bien?
+       
+        if(!fin.isActiveAndEnabled && agarre  && Vector3.Dot( transform.forward, Vector3.right ) < -0.75)  // 0.25 ta bien?
         {
              float megamanX = megaman.position.x;
              float megamanY = megaman.position.y;
@@ -1175,15 +1177,22 @@ private Transform esfera;
 
         transform.rotation = Quaternion.Lerp(transform.rotation,rot, Time.deltaTime * 30f); 
 
-        if(  megaman.position.x == posAgarre.x  ) // fin del agarre? comprobar que sea exacto o usar aproximatly, hmm demora un poqquito en lograr
+        float megamanAprox = Mathf.Round( megaman.position.x * 10f ) *0.1f;
+        float AgarreAprox = Mathf.Round( posAgarre.x * 10f ) *0.1f;
+        
+        if( agarre &&  megamanAprox == AgarreAprox  ) // fin del agarre
         {
             //posicionar zero
             if(zero)
             {
                 //zero.gameObject.SetActive(true);
-                zero.position = megaman.position + new Vector3(-4,0,0 );
+                Transform vilePos = GameObject.Find("VilePos").transform; // dberia usar tag para que sea mas eficiente?
+                vilePos.position = transform.position;
+                transform.SetParent(vilePos);
+                transform.localPosition  = Vector3.zero;
+                zero.parent.position = megaman.position + new Vector3(-6,-0.5f,0 );
             }
-            finObjeto.transform.GetComponent<PlayableDirector>().enabled = true;
+            fin.enabled = true;
         }       
     }   
 
