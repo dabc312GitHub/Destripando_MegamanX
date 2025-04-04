@@ -51,7 +51,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Ancho: 0.6
+    - _Ancho: 0.304
+    - _Distorsion: 0.866
+    - _Float: 0.113
     - _QueueControl: 0
     - _QueueOffset: 0
     m_Colors:

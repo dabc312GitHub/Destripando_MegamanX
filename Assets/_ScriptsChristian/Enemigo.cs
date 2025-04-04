@@ -1109,8 +1109,13 @@ private Transform esfera;
     {
         
         esfera.position = Vector3.MoveTowards(esfera.position, megaman.position, Time.deltaTime *5);
+        GameObject shockEfecto = GameObject.Find("Shock");
         if( esfera.position.x ==  megaman.position.x)
+        {
+            if(shockEfecto)
+                shockEfecto.transform.GetChild(0).gameObject.SetActive(true);
             esfera.gameObject.SetActive(false);
+        }
 
         //Lanzar el rayo, activar megaman arrodillado, desactivar controlador de megaman, repos camara, acercarse coger megaman y al final activar animacion Timeline de final
         Animator megaAnimator =  megaman.GetComponent<Animator>();
@@ -1205,9 +1210,10 @@ private Transform esfera;
     public void NaveReposicionar()
     {
         //if(naveDirector)naveDirector.enabled = false;       
-        Transform vilePos = GameObject.Find("VilePos").transform;
-        transform.position = new Vector3( vilePos.position.x + 2f,  transform.position.y, transform.position.z);
-        
+        Transform vilePos = GameObject.Find("VilePos").transform;        
+      
+        transform.position = new Vector3( vilePos.position.x +6f ,  transform.position.y, transform.position.z);
+               
     }   
 
 
