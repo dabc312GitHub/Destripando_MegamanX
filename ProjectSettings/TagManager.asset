@@ -17,6 +17,7 @@ TagManager:
   - PisoOcupado
   - Mina
   - Plasma
+  - Capsula
   layers:
   - Default
   - TransparentFX

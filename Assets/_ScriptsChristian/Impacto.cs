@@ -88,7 +88,11 @@ public class Impacto : MonoBehaviour
 
         }
         else
-            vidaUI.SetFloat("_Salud", vida/vidaMaxima);
+        {
+            float v =  vidaUI.GetFloat("_Salud") - (d * 0.05f) ;
+            Debug.Log( "daño " +  d + " total ="+  v);
+            vidaUI.SetFloat("_Salud", v);
+        }
        
 
     }

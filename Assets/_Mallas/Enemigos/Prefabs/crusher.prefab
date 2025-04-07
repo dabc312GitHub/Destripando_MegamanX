@@ -137,7 +137,9 @@ MonoBehaviour:
   misil: {fileID: 0}
   bombbeenMina: {fileID: 0}
   balaRoadAt: {fileID: 0}
+  naveDirector: {fileID: 0}
   enemigoInstancia: {fileID: 0}
+  vile: {fileID: 0}
 --- !u!114 &1743337181886951745
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -168,7 +170,7 @@ Animator:
   m_Enabled: 1
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 2e7deb265638c7642824f28d4d48e850, type: 2}
-  m_CullingMode: 0
+  m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
@@ -220,4 +222,6 @@ MonoBehaviour:
   misil: {fileID: 0}
   bombbeenMina: {fileID: 0}
   balaRoadAt: {fileID: 0}
+  naveDirector: {fileID: 0}
   enemigoInstancia: {fileID: 0}
+  vile: {fileID: 0}

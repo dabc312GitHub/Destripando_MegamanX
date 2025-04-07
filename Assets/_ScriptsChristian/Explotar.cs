@@ -22,33 +22,50 @@ public class Explotar : MonoBehaviour
    private Vector3 posEnemigos;
    private int indice;
 
+   private static Transform capsulaSalud;
+   public static List<Transform> capsulas = new List<Transform>();
+   private int capsulaIndice;
+
    void Start()
    {
-        ImpactoScript = GameObject.Find("megamanxCompleto").GetComponent<Impacto>();
-        matA = ImpactoScript.getMaterialA();
-        matB = ImpactoScript.getMaterialB();
-        //matA.SetFloat("_Invulnerable",1.0f); // si se utiliza aqui se malogra???
-        //matB.SetFloat("_Invulnerable",1.0f);
-        segundosInvencible = ImpactoScript.getSegInvencible();
-
-
-        posPool = new Vector3 (0,-20,0);
-        posEnemigos = new Vector3 (4,-20,0);
-        indice = 0;
-        Transform exp;
-        
-        if(poolExplosion.Count == 0)
+        if( tag != "Capsula")
         {
-             for( int i =0; i< explosionesMax ; i++)
+
+            ImpactoScript = GameObject.Find("megamanxCompleto").GetComponent<Impacto>();
+            matA = ImpactoScript.getMaterialA();
+            matB = ImpactoScript.getMaterialB();
+            //matA.SetFloat("_Invulnerable",1.0f); // si se utiliza aqui se malogra???
+            //matB.SetFloat("_Invulnerable",1.0f);
+            segundosInvencible = ImpactoScript.getSegInvencible();
+
+            capsulaSalud = GameObject.Find("salud").transform; // no hay otra forma que no de flojera?
+            capsulaSalud.GetComponent<Rigidbody>().useGravity = false;// pa que no se caiga
+
+            posPool = new Vector3 (0,-20,0);
+            posEnemigos = new Vector3 (4,-20,0);
+            indice = 0;
+            capsulaIndice = 0;
+            Transform exp;
+            
+            if(poolExplosion.Count == 0)
             {
-                exp =  Instantiate(explosion);
-                exp.gameObject.SetActive(false);
-                exp.position = posPool;
-                poolExplosion.Add(exp);
+                 for( int i =0; i< explosionesMax ; i++)
+                {
+                    exp =  Instantiate(explosion);
+                    exp.gameObject.SetActive(false);
+                    exp.position = posPool;
+                    poolExplosion.Add(exp);
+
+                    exp = Instantiate(capsulaSalud);
+                    exp.gameObject.SetActive(false);
+                    exp.position = posPool;
+                    capsulas.Add(exp);
+                }
             }
+
         }
        
-
+        
 
    }
 
@@ -94,26 +111,31 @@ public class Explotar : MonoBehaviour
                          this.transform.position = posEnemigos; //solo moverlo, si muere en antibalas interrumpe script y causa bug 
                         Col.transform.parent.GetComponent<Impacto>().Damage(2f); // todos hacen daño 2? 
                     }
-                         
 
                     else
                         Col.transform.parent.GetComponent<Impacto>().Damage(1f); //  disparo de bee y otros?
                    
-                   ImpactoMega(Col);
-
+                   if(!gameObject.CompareTag("Capsula"))
+                        ImpactoMega(Col);       
                }
 
                 else 
-                  StartCoroutine("ExplotaTiempo",Col); //minas de bombeen deberian explotar apenas tocan suelo y no apenas toquen megaan?
-              
-            }        
+                  StartCoroutine("ExplotaTiempo",Col); //minas de bombeen deberian explotar apenas tocan suelo y no apenas toquen megaan?   
+                             
+            } 
+
+
+            if(gameObject.CompareTag("Capsula"))
+            {
+                transform.parent.position = posEnemigos;
+                if(Col.transform.parent) // este es para la extension
+                    Col.transform.parent.GetComponent<Impacto>().Damage(-1f); // sana 1
+                else // este es para el character controller
+                    Col.transform.GetComponent<Impacto>().Damage(-1f); // sana 1
+            }
             
         }
-        /* Que muera en Antibalas
-        else if(gameObject.tag == "Proyectil") // si choco pared sinedo proyectil 
-        {
-            Explota();
-        } */           
+              
                 
    }
 
@@ -142,10 +164,24 @@ public class Explotar : MonoBehaviour
    
    public void Explota()
    {
-        //Transform exp =  Instantiate(explosion);
-        //exp.position = this.transform.position;
+       if( tag == "Untagged") // impedir que proyectiles boten capsulas
+       {
 
-        int i = indice%poolExplosion.Count;
+            int j = capsulaIndice % capsulas.Count;
+
+            int posibilidad = Random.Range(0, 3); //25% prob?
+            
+            if(posibilidad == 2)
+            {
+                capsulas[j].position = transform.position + new Vector3(0,1,0);
+                capsulas[j].gameObject.SetActive(true);
+                capsulas[j].GetComponent<Rigidbody>().useGravity = true;
+
+                StartCoroutine("ContadorCapsula",j);
+            }
+       }
+
+       int i = indice%poolExplosion.Count;
 
         poolExplosion[i].position = this.transform.position;
         poolExplosion[i].gameObject.SetActive(true);
@@ -158,10 +194,21 @@ public class Explotar : MonoBehaviour
    IEnumerator MoverExplosion(int i)
    {
         this.transform.position = posEnemigos; //no lo puedo matar arruina el resto del codigo, guardarlo en una lista y matarlos luego?
+        if(transform.GetComponent<Enemigo>())
+            transform.GetComponent<Enemigo>().enabled = false; // pa que no se muevan, comprobar que no arruine abeja y otros?
         yield return new WaitForSeconds(2);
         poolExplosion[i].transform.position = posPool;
         poolExplosion[i].gameObject.SetActive(false);
         indice ++;        
         yield return null;
    }
+
+    IEnumerator ContadorCapsula(int j)
+    {
+        yield return new WaitForSeconds(5); //5       
+        capsulas[j].transform.position = posPool;
+        capsulas[j].gameObject.SetActive(false);
+        capsulaIndice ++; 
+
+    }
 }
