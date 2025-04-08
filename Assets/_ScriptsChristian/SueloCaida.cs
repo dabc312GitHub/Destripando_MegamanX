@@ -7,11 +7,11 @@ public class SueloCaida : MonoBehaviour
     private Transform bloque = null;
 
     void OnTriggerEnter(Collider obj)
-    {
-        Debug.Log("quien entra: "+ obj.gameObject.name);
+    {   
+      
         if( obj.gameObject.tag =="Player" )
-        {
-            Debug.Log("caere");
+        {           
+
             bloque = transform.parent;
             StartCoroutine("caida");
         }

@@ -3,6 +3,8 @@ using UnityEngine;
 using Cinemachine.Examples;
 using UnityEngine.Serialization;
 using UnityEngine.Animations.Rigging;
+using System.Collections;
+using System.Collections.Generic;
 
 [AddComponentMenu("")] // Don't display in add component menu
 public class CharacterInputPlayer_Chris : MonoBehaviour
@@ -72,6 +74,9 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 	private ChainIKConstraint IK_R;
 	private ChainIKConstraint IK_L;
 
+	private AudioSource SonidosPlayer;
+	public List<AudioClip> sonidos; 
+
 	void Start ()
 	{
 		
@@ -96,6 +101,8 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 
 	    IK_R.weight =0; 
 		IK_L.weight =0;
+
+		SonidosPlayer = GetComponent<AudioSource>();
 
 	    
 	}
@@ -190,17 +197,32 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 				bullet.transform.position = firePoint.position;
 				bullet.GetComponent<Rigidbody>().linearVelocity = bullet.transform.forward *  bulletSpeed_1; //Vector3.right * (firePoint.right.z * bulletSpeed_1);
 
+				SonidosPlayer.resource = sonidos[0];
+				if(!SonidosPlayer.isPlaying)
+					SonidosPlayer.Play();
+
 			}
 
 			if(_counterFireShooting > 0.8f)
 			{
 				VFX_brilloCarga.SetFloat("_Carga", 1.0f);
 				particulasCarga.SetActive(true);
+
+						
+				if(!SonidosPlayer.isPlaying)
+				{
+					SonidosPlayer.resource = sonidos[3];	
+					SonidosPlayer.Play();
+				}
 			}
 
-			if(_counterFireShooting > 2.9f)
+			if(_counterFireShooting > 2f)
 			{				
 				colorCargaMat.SetColor("_Color", chargerColor_2);
+				SonidosPlayer.resource = sonidos[4];
+				SonidosPlayer.loop = true;
+				if(!SonidosPlayer.isPlaying)
+					SonidosPlayer.Play();
 			}
 				
 				
@@ -216,7 +238,7 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 		{
 			//Debug.Log(_counterFireShooting);
 		
-			if (_counterFireShooting >= 2f && _counterFireShooting < 3)
+			if (_counterFireShooting >= 1f && _counterFireShooting < 2)
 			{				
 
 				bullet = Instantiate(bullet2, firePoint.position, Quaternion.Euler(0, 90 *signo, 0));
@@ -225,8 +247,12 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 				
 				bullet.GetComponent<Rigidbody>().linearVelocity = bullet.transform.forward  * bulletSpeed_2;
 				particulasCarga.SetActive(false);
+
+				SonidosPlayer.resource = sonidos[1];
+				if(!SonidosPlayer.isPlaying)
+					SonidosPlayer.Play();
 			}		
-			else if ( _counterFireShooting >= 3 )
+			else if ( _counterFireShooting >= 2 )
 			{
 						
 				bullet = Instantiate(bullet3, firePoint.position, Quaternion.Euler(0, 90 * signo, 0));
@@ -234,7 +260,12 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 				bullet.transform.position = firePoint.position;
 				
 				bullet.GetComponent<Rigidbody>().linearVelocity = bullet.transform.forward *  bulletSpeed_3; //buscar forma sin rigidbody para balas porsiaca
-				particulasCarga.SetActive(false);				
+				particulasCarga.SetActive(false);
+
+				SonidosPlayer.loop = false;
+				SonidosPlayer.resource = sonidos[2];
+				if(!SonidosPlayer.isPlaying)
+					SonidosPlayer.Play();				
 			}
 
 			_counterFireShooting = 0.0f;
@@ -364,7 +395,10 @@ public class CharacterInputPlayer_Chris : MonoBehaviour
 		WallCheck();
 	}
 
-	
+	public List<AudioClip> GetAudios()
+	{
+		return sonidos;
+	}
 	
     public void GroundedCheck() // mascara para que no sale encima de balas o enemigos?
     {

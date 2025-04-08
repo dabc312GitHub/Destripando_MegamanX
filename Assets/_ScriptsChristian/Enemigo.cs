@@ -94,6 +94,10 @@ public class Enemigo : MonoBehaviour
 
     private  AnimEvents animEventsScript;
 
+    //private List<AudioClip> sonidos = null;
+    private AudioSource SonidosEnem = null;
+
+
     void Start() // me parece que Enemigo.cs e Impacto.cs deberian fusionarse e incluir proyectil como tipo de enemigo
     {
         
@@ -174,6 +178,9 @@ public class Enemigo : MonoBehaviour
 
         if(!camara)
             camara = Camera.main;
+
+         if(GetComponent<AudioSource>())   
+             SonidosEnem = GetComponent<AudioSource>();
 
 
     }
@@ -1481,14 +1488,17 @@ private Transform esfera;
         if(other.gameObject.CompareTag("MegamanAtaqueA")) //basico
         {
             Damage(1); // si balas basicas chocan deberian desparecer, las fuerets si traspasan?
+            SonidosEnem.Play();
             Destroy(other.gameObject); // ?? mejor pooling pero de momento no
         }
         else if(other.gameObject.CompareTag("MegamanAtaqueB")) //medio
         {
+            SonidosEnem.Play();
              Damage(2); //mueren en Antibalas
         }
         else if(other.gameObject.CompareTag("MegamanAtaqueC"))//alto
         {
+            SonidosEnem.Play();
             Damage(4); //mueren en Antibalas
         }
 

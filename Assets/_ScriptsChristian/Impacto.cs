@@ -19,6 +19,10 @@ public class Impacto : MonoBehaviour
     private float vidaMaxima;
     private bool endGame = false; // no morir cuando vile me mate
 
+    private List<AudioClip> sonidos = null;
+    private AudioSource SonidosPlayer;
+
+
     void Start()
     {
         FullScreenMat.SetFloat("_EfectoBlanco",0);
@@ -32,6 +36,9 @@ public class Impacto : MonoBehaviour
         megamanMatA.SetFloat("_Invulnerable",0.0f); // y aqui creo qe no se malogra?
         megamanMatB.SetFloat("_Invulnerable",0.0f);
         vidaMaxima = vida;
+
+        SonidosPlayer = GetComponent<AudioSource>();
+        sonidos = GetComponent<CharacterInputPlayer_Chris>().GetAudios();
 
     }
 
@@ -67,13 +74,19 @@ public class Impacto : MonoBehaviour
 
    
     void Impactar()  // quedaria mejor con corutina?, cambio menos brusco pero afectaria sincronizacion con las transiciones de anims?
-    {
+    {               //deberia interrumpir todas las acciones
         if(mat)
         {            
             controlImpacto.SetFloat("_Impacto",1.0f);
             //megamanMatA.SetFloat("_Invulnerable",1.0f);
             //megamanMatB.SetFloat("_Invulnerable",1.0f);
         }
+        
+     
+        SonidosPlayer.Stop();
+        SonidosPlayer.resource = sonidos[5];
+                if(!SonidosPlayer.isPlaying)
+                    SonidosPlayer.Play();   
     }
 
     public void Damage (float d)
@@ -100,6 +113,11 @@ public class Impacto : MonoBehaviour
 
     void Muerte()
     {
+         SonidosPlayer.Stop();
+         SonidosPlayer.resource = sonidos[6];
+         //SonidosPlayer.loop = true;
+          SonidosPlayer.Play();  
+
         vida =0;
         vidaUI.SetFloat("_Salud", 0.0f);
         muerte.gameObject.SetActive(true);
