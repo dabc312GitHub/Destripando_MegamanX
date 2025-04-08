@@ -10,7 +10,7 @@ public class Impacto : MonoBehaviour
     [SerializeField] private Material vidaUI;
     [SerializeField] private Material megamanMatA;
     [SerializeField] private Material megamanMatB;
-    [SerializeField] private float segInvencible = 2.0f;
+    [SerializeField] private float segInvencible = 1.5f;
     [SerializeField] private Material FullScreenMat;
     private Material controlImpacto;
     private Animator animator;

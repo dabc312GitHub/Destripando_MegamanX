@@ -1499,9 +1499,12 @@ private Transform esfera;
 
          if(other.gameObject.CompareTag("ZonaMuerte"))
         {
-            Destroy(this.gameObject);
+            transform.position = new Vector3 (4,-20,0);
+            //Destroy(this.gameObject); // si destruyo puedo interrumpir invulnerabilidad
         }
     }
+
+
 
 
 

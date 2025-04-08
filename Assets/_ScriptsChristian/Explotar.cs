@@ -98,6 +98,8 @@ public class Explotar : MonoBehaviour
                     {
                         if(Col.transform.parent) // para que no toa en cuenta el Charactercontroller (si es lo que causa problemas)
                             Col.transform.parent.GetComponent<Impacto>().Damage(enemigoScript.getAtaqueCol()); //daño por chocar enemigos //puede que a veces choque con characterController?
+                        else
+                            Col.transform.GetComponent<Impacto>().Damage(enemigoScript.getAtaqueCol()); // necesario?
                     }
 
                     else if( gameObject.CompareTag("Proyectil") ) 
@@ -194,9 +196,11 @@ public class Explotar : MonoBehaviour
    IEnumerator MoverExplosion(int i)
    {
         this.transform.position = posEnemigos; //no lo puedo matar arruina el resto del codigo, guardarlo en una lista y matarlos luego?
-        if(transform.GetComponent<Enemigo>())
-            transform.GetComponent<Enemigo>().enabled = false; // pa que no se muevan, comprobar que no arruine abeja y otros?
         yield return new WaitForSeconds(2);
+
+        if(transform.GetComponent<Enemigo>()) // si desactivo mientras megaman esta invulnerable queda infinito, cuidado con tiempos
+            transform.GetComponent<Enemigo>().enabled = false; // pa que no se muevan, comprobar que no arruine abeja y otros?
+       
         poolExplosion[i].transform.position = posPool;
         poolExplosion[i].gameObject.SetActive(false);
         indice ++;        
